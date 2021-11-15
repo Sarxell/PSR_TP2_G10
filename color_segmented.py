@@ -54,7 +54,7 @@ def main():
         [ranges['limits']['B']['max'], ranges['limits']['G']['max'], ranges['limits']['R']['max']] = maxs
 
         mask = cv2.inRange(frame, mins, maxs)
-        # mask = ~mask
+
         cv2.imshow(segmented_window, mask)
 
         if cv2.waitKey(1) & 0xFF == ord('w'):

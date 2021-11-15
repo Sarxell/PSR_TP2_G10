@@ -31,11 +31,11 @@ def main():
     cv2.namedWindow(segmented_window)
 
     cv2.createTrackbar('min B/H', segmented_window, 0, 255, onTrackbar)
-    cv2.createTrackbar('max B/H', segmented_window, 0, 255, onTrackbar)
+    cv2.createTrackbar('max B/H', segmented_window, 255, 255, onTrackbar)
     cv2.createTrackbar('min G/S', segmented_window, 0, 255, onTrackbar)
-    cv2.createTrackbar('max G/S', segmented_window, 0, 255, onTrackbar)
-    cv2.createTrackbar('min R/V', segmented_window, 0, 255, onTrackbar)
-    cv2.createTrackbar('max R/V', segmented_window, 229, 255, onTrackbar)
+    cv2.createTrackbar('max G/S', segmented_window, 255, 255, onTrackbar)
+    cv2.createTrackbar('min R/V', segmented_window, 229, 255, onTrackbar)
+    cv2.createTrackbar('max R/V', segmented_window, 255, 255, onTrackbar)
 
     while True:
         frame = vs.read()
@@ -54,7 +54,6 @@ def main():
         [ranges['limits']['B']['max'], ranges['limits']['G']['max'], ranges['limits']['R']['max']] = maxs
 
         mask = cv2.inRange(frame, mins, maxs)
-
         cv2.imshow(segmented_window, mask)
 
         if cv2.waitKey(1) & 0xFF == ord('w'):

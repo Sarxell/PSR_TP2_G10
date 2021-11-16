@@ -1,73 +1,57 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.8
 
-import argparse
+import json
 import cv2
 import numpy as np
-import json
-from imutils.video import VideoStream
 
 
-def onTrackbar(val):
+def onTrackbar(x):
     pass
 
+
 def main():
-    vs = VideoStream(0).start()
     window_name = 'original'
-    segmented_window = 'segmented'
-    frame = vs.read()
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     cv2.namedWindow(window_name)
-    cv2.imshow(window_name, frame)
+    mask_window = 'mask'
+    cv2.namedWindow(mask_window)
+    capture = cv2.VideoCapture(0)
+    capture.set(cv2.CAP_PROP_FPS, 15)
 
     ranges = {'limits': {'B': {'max': 255, 'min': 0},
-                        'G': {'max': 255, 'min': 0},
-                        'R': {'max': 255, 'min': 229}}}
+                         'G': {'max': 255, 'min': 0},
+                         'R': {'max': 255, 'min': 0}}}
 
-    # takes the values from the dictionary, could not be needed
     mins = np.array([ranges['limits']['B']['min'], ranges['limits']['G']['min'], ranges['limits']['R']['min']])
     maxs = np.array([ranges['limits']['B']['max'], ranges['limits']['G']['max'], ranges['limits']['R']['max']])
 
-    cv2.namedWindow(segmented_window)
-    # creates the trackbars
-    cv2.createTrackbar('min B/H', segmented_window, 0, 255, onTrackbar)
-    cv2.createTrackbar('max B/H', segmented_window, 255, 255, onTrackbar)
-    cv2.createTrackbar('min G/S', segmented_window, 0, 255, onTrackbar)
-    cv2.createTrackbar('max G/S', segmented_window, 255, 255, onTrackbar)
-    cv2.createTrackbar('min R/V', segmented_window, 229, 255, onTrackbar)
-    cv2.createTrackbar('max R/V', segmented_window, 255, 255, onTrackbar)
+    cv2.createTrackbar('min B/H', mask_window, 0, 255, onTrackbar)
+    cv2.createTrackbar('max B/H', mask_window, 255, 255, onTrackbar)
+    cv2.createTrackbar('min G/S', mask_window, 0, 255, onTrackbar)
+    cv2.createTrackbar('max G/S', mask_window, 255, 255, onTrackbar)
+    cv2.createTrackbar('min R/V', mask_window, 0, 255, onTrackbar)
+    cv2.createTrackbar('max R/V', mask_window, 255, 255, onTrackbar)
 
     while True:
-        frame = vs.read()
-        cv2.imshow(window_name, frame)
-        # HSV convert
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        _, image = capture.read()
+        cv2.imshow(window_name, image)
 
-        # getting the values of the trackbars
-        mins[0] = cv2.getTrackbarPos('min B/H', segmented_window)
-        mins[1] = cv2.getTrackbarPos('min G/S', segmented_window)
-        mins[2] = cv2.getTrackbarPos('min R/V', segmented_window)
-        maxs[0] = cv2.getTrackbarPos('max B/H', segmented_window)
-        maxs[1] = cv2.getTrackbarPos('max G/S', segmented_window)
-        maxs[2] = cv2.getTrackbarPos('max R/V', segmented_window)
+        ranges['limits']['B']['min'] = mins[0] = cv2.getTrackbarPos('min B/H', mask_window)
+        ranges['limits']['G']['min'] = mins[1] = cv2.getTrackbarPos('min G/S', mask_window)
+        ranges['limits']['R']['min'] = mins[2] = cv2.getTrackbarPos('min R/V', mask_window)
+        ranges['limits']['B']['max'] = maxs[0] = cv2.getTrackbarPos('max B/H', mask_window)
+        ranges['limits']['G']['max'] = maxs[1] = cv2.getTrackbarPos('max G/S', mask_window)
+        ranges['limits']['R']['max'] = maxs[2] = cv2.getTrackbarPos('max R/V', mask_window)
 
-        # the updated values are placed again in the dictionary
-        [ranges['limits']['B']['min'], ranges['limits']['G']['min'], ranges['limits']['R']['min']] = mins
-        [ranges['limits']['B']['max'], ranges['limits']['G']['max'], ranges['limits']['R']['max']] = maxs
-
-        # creates the mask with the values
-        mask = cv2.inRange(gray, mins, maxs)
-        cv2.imshow(segmented_window, mask)
+        mask_black = cv2.inRange(image, mins, maxs)
+        cv2.imshow(mask_window, mask_black)
 
         if cv2.waitKey(1) & 0xFF == ord('w'):
-            # writes in the file limits.json
             file_name = 'limits.json'
             with open(file_name, 'w') as file_handle:
-                print('writing dictionary d to file ' + file_name)
-                json.dump(str(ranges), file_handle)  # d is the dicionary
-
+                print('writing dictionary ranges to file ' + file_name)
+                json.dump(ranges, file_handle)  # d is the dictionary
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
 
 
 if __name__ == '__main__':

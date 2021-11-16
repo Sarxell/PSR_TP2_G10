@@ -3,8 +3,6 @@
 import argparse
 import cv2
 import numpy as np
-from functools import partial
-import readchar
 import json
 from imutils.video import VideoStream
 

@@ -41,7 +41,8 @@ def centroid(edges, frame):
         #print ('Number of contours found = ', len(contours))
 
         #handles the case of not detecting any objects
-        if contours!=[]:
+        #changed only to countors because empty gives "()" and was giving an error
+        if contours:
             #if it finds objects, it will sort them from biggest to smallest
             sorted_contours= sorted(contours, key=cv2.contourArea, reverse= True)
             #the biggest will be the first on the list
@@ -84,6 +85,7 @@ def main():
     img = np.zeros((h, w, 3), np.uint8)
     img.fill(255)
     cv2.imshow('canvas', img)
+
     #mask, gray e video só estou aqui para conseguir testar os mousecallbacks nessas janelas, são para ser removidos depois
     cv2.imshow('gray', img)
     cv2.imshow('mask', img)
@@ -108,10 +110,10 @@ def main():
         # converts frames to HSV
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         # creates the mask with the values
-        mask = cv2.inRange(frame, mins, maxs)
+        mask = cv2.inRange(gray, mins, maxs)
 
         #trying to use this to define edges of recognized objects and track only the biggest one
-        edges= cv2.Canny(mask, 200, 180)
+        edges = cv2.Canny(mask, 200, 180)
 
         #calculating centroid and placing marker
         centroid(edges, frame)
@@ -120,7 +122,6 @@ def main():
         cv2.imshow('canvas', img)
         cv2.imshow('mask', mask)
         cv2.imshow('gray', edges)
-
 
         key = cv2.waitKey(1)
         if key != -1:

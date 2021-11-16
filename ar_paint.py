@@ -38,7 +38,7 @@ def line_drawing(img, color, thickness, event, x, y, flags, param):
 def centroid(edges, frame):
     #contours holds all objects identified, each object is composed of its edges coordinates
         contours, hierarchy= cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        print ('Number of contours found = ', len(contours))
+        #print ('Number of contours found = ', len(contours))
 
         #handles the case of not detecting any objects
         if contours!=[]:

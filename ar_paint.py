@@ -1,6 +1,7 @@
 import argparse
 import cv2
 import json
+import ast
 import numpy as np
 from functools import partial
 from imutils.video import VideoStream
@@ -36,9 +37,7 @@ def main():
     args = vars(parser.parse_args())
 
     # leitura do ficheiro json
-    json1_file = open(args['json'])
-    json1_str = json1_file.read()
-    ranges=json.loads(json1_str)
+    ranges = json.load(open(args['json']))
 
     print(ranges)
     # min and max values in the json file

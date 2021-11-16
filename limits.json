@@ -1,1 +1,1 @@
-{"limits": {"B": {"max": 
+{"limits": {"B": {"max": 110, "min": 0}, "G": {"max": 255, "min": 0}, "R": {"max": 255, "min": 0}}}

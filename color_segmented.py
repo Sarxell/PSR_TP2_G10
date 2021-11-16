@@ -23,11 +23,12 @@ def main():
                         'G': {'max': 255, 'min': 0},
                         'R': {'max': 255, 'min': 229}}}
 
+    # takes the values from the dictionary, could not be needed
     mins = np.array([ranges['limits']['B']['min'], ranges['limits']['G']['min'], ranges['limits']['R']['min']])
     maxs = np.array([ranges['limits']['B']['max'], ranges['limits']['G']['max'], ranges['limits']['R']['max']])
 
     cv2.namedWindow(segmented_window)
-
+    # creates the trackbars
     cv2.createTrackbar('min B/H', segmented_window, 0, 255, onTrackbar)
     cv2.createTrackbar('max B/H', segmented_window, 255, 255, onTrackbar)
     cv2.createTrackbar('min G/S', segmented_window, 0, 255, onTrackbar)
@@ -38,6 +39,7 @@ def main():
     while True:
         frame = vs.read()
         cv2.imshow(window_name, frame)
+        # HSV convert
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         # getting the values of the trackbars
@@ -48,13 +50,16 @@ def main():
         maxs[1] = cv2.getTrackbarPos('max G/S', segmented_window)
         maxs[2] = cv2.getTrackbarPos('max R/V', segmented_window)
 
+        # the updated values are placed again in the dictionary
         [ranges['limits']['B']['min'], ranges['limits']['G']['min'], ranges['limits']['R']['min']] = mins
         [ranges['limits']['B']['max'], ranges['limits']['G']['max'], ranges['limits']['R']['max']] = maxs
 
-        mask = cv2.inRange(frame, mins, maxs)
+        # creates the mask with the values
+        mask = cv2.inRange(gray, mins, maxs)
         cv2.imshow(segmented_window, mask)
 
         if cv2.waitKey(1) & 0xFF == ord('w'):
+            # writes in the file limits.json
             file_name = 'limits.json'
             with open(file_name, 'w') as file_handle:
                 print('writing dictionary d to file ' + file_name)

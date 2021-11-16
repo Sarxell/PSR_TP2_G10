@@ -23,13 +23,13 @@ def main():
     cv2.namedWindow(window_name)
     cv2.imshow(window_name, frame)
 
-    ranges = {'limits': {'B': {'max': 255, 'min': 0},
+    ranges = {'B': {'max': 255, 'min': 0},
                          'G': {'max': 255, 'min': 0},
-                         'R': {'max': 255, 'min': 229}}}
+                         'R': {'max': 255, 'min': 229}}
 
     # takes the values from the dictionary, could not be needed
-    mins = np.array([ranges['limits']['B']['min'], ranges['limits']['G']['min'], ranges['limits']['R']['min']])
-    maxs = np.array([ranges['limits']['B']['max'], ranges['limits']['G']['max'], ranges['limits']['R']['max']])
+    mins = np.array([ranges['B']['min'], ranges['G']['min'], ranges['R']['min']])
+    maxs = np.array([ranges['B']['max'], ranges['G']['max'], ranges['R']['max']])
 
     cv2.namedWindow(segmented_window)
     # creates the trackbars
@@ -48,27 +48,29 @@ def main():
 
         # getting the values of the trackbars
         # places the value in the dictionary
-        ranges['limits']['B']['min'] = mins[0] = cv2.getTrackbarPos('min B/H', segmented_window)
-        ranges['limits']['G']['min'] = mins[1] = cv2.getTrackbarPos('min G/S', segmented_window)
-        ranges['limits']['R']['min'] = mins[2] = cv2.getTrackbarPos('min R/V', segmented_window)
-        ranges['limits']['B']['max'] = maxs[0] = cv2.getTrackbarPos('max B/H', segmented_window)
-        ranges['limits']['G']['max'] = maxs[1] = cv2.getTrackbarPos('max G/S', segmented_window)
-        ranges['limits']['R']['max'] = maxs[2] = cv2.getTrackbarPos('max R/V', segmented_window)
+        ranges['B']['min'] = mins[0] = cv2.getTrackbarPos('min B/H', segmented_window)
+        ranges['G']['min'] = mins[1] = cv2.getTrackbarPos('min G/S', segmented_window)
+        ranges['R']['min'] = mins[2] = cv2.getTrackbarPos('min R/V', segmented_window)
+        ranges['B']['max'] = maxs[0] = cv2.getTrackbarPos('max B/H', segmented_window)
+        ranges['G']['max'] = maxs[1] = cv2.getTrackbarPos('max G/S', segmented_window)
+        ranges['R']['max'] = maxs[2] = cv2.getTrackbarPos('max R/V', segmented_window)
 
         # creates the mask with the values
         mask = cv2.inRange(gray, mins, maxs)
         cv2.imshow(segmented_window, mask)
 
-        if cv2.waitKey(1) & 0xFF == ord('w'):
-            # writes in the file limits.json
-            file_name = 'limits.json'
-            with open(file_name, 'w') as file_handle:
-                print('writing dictionary d to file ' + file_name)
-                json.dump(ranges, file_handle)  # d is the dicionary
+        #reading keys
+        key=cv2.waitKey(20)
+        if key != -1:
+            if key == ord('w'):
+                # writes in the file limits.json
+                file_name = 'limits.json'
+                with open(file_name, 'w') as file_handle:
+                    print('writing dictionary d to file ' + file_name)
+                    json.dump(ranges, file_handle)  # d is the dicionary
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
+            if key == ord('q'):
+                break
 
 
 if __name__ == '__main__':

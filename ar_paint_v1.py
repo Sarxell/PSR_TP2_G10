@@ -137,9 +137,10 @@ def main():
         frame_copy = copy.copy(frame)
         frame_copy[(mask_size == 255)] = (0, 255, 0)
 
-        # drawing the marker for the centroid, needs to be a cross
+        # drawing the marker for the centroid, it is a cross
         if x:
-            cv2.circle(frame_copy, (int(x), int(y)), 10, (0, 0, 255), 5)
+            cv2.line(frame_copy, (int(x)-10, int(y)+10), (int(x)+10, int(y)-10), (0,0,255), 5)
+            cv2.line(frame_copy, (int(x) + 10, int(y)+10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
 
         mask_drawing(img, color, thickness, x, y)

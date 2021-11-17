@@ -7,6 +7,8 @@ from imutils.video import VideoStream
 
 drawing = False  # true if mouse is pressed
 pt1_x, pt1_y = None, None
+flag = 0
+past_x, past_y = None, None
 
 
 def removeSmallComponents(image, threshold):
@@ -26,7 +28,7 @@ def removeSmallComponents(image, threshold):
             threshold = sizes[i]
             img2[output == i + 1] = 255
 
-    return img2, x ,y
+    return img2, x, y
 
 
 # mouse callback function
@@ -37,12 +39,6 @@ def line_drawing(img, color, thickness, event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
         pt1_x, pt1_y = x, y
-
-    # this event is purely for testing centroid coords
-    if event == cv2.EVENT_RBUTTONDOWN:
-        print("coords")
-        print(x, y)
-        exit()
 
     # starts drawing
     elif event == cv2.EVENT_MOUSEMOVE:
@@ -56,7 +52,37 @@ def line_drawing(img, color, thickness, event, x, y, flags, param):
         cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
 
 
+# mouse callback function
+def mask_drawing(img, color, thickness, x, y):
+    # flag to see if is a new line or not
+    global flag
+    global past_x, past_y
+
+    if x:
+        x = int(x)
+        y = int(y)
+        # it means there is a new line
+        if flag == 1:
+            cv2.line(img, (x,y), (x, y), color=color, thickness=thickness)
+            past_x = x
+            past_y = y
+            flag = 0
+        else:
+            # if flag = 0 it's the same line
+            cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+            past_x = x
+            past_y = y
+
+    else:
+        # it starts to be a new line again
+        flag = 1
+
+
+
+
+
 def main():
+    global flag
     parser = argparse.ArgumentParser(description='OPenCV example')
     parser.add_argument('-j', '--json', required=True, type=str, help='Full path to json file')
     args = vars(parser.parse_args())
@@ -106,11 +132,13 @@ def main():
         mask = cv2.inRange(frame, mins, maxs)
 
         mask_size, x, y = removeSmallComponents(mask, 500)
-        print((x, y))
 
         # drawing the marker for the centroid
         if x:
             cv2.circle(frame, (int(x), int(y)), 10, (0, 0, 255), 5)
+
+
+        mask_drawing(img, color, thickness, x, y)
 
 
 

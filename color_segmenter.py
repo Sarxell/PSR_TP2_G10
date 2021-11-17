@@ -37,7 +37,7 @@ def main():
         _, frame = capture.read()
 
         mins = np.array([ranges['B']['min'], ranges['G']['min'], ranges['R']['min']])
-        maxs = np.array([ranges['G']['max'], ranges['G']['max'], ranges['R']['max']])
+        maxs = np.array([ranges['B']['max'], ranges['G']['max'], ranges['R']['max']])
 
         mask = cv2.inRange(frame, mins, maxs)
 

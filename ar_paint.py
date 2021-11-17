@@ -1,7 +1,6 @@
 import argparse
 import cv2
 import json
-import ast
 import numpy as np
 from functools import partial
 from imutils.video import VideoStream
@@ -35,30 +34,31 @@ def line_drawing(img, color, thickness, event, x, y, flags, param):
         drawing = False
         cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
 
-def centroid(edges, frame):
-    #contours holds all objects identified, each object is composed of its edges coordinates
-        contours, hierarchy= cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        #print ('Number of contours found = ', len(contours))
 
-        #handles the case of not detecting any objects
-        #changed only to countors because empty gives "()" and was giving an error
+def centroid(edges, frame):
+    # contours holds all objects identified, each object is composed of its edges coordinates
+        contours, hierarchy= cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        # print ('Number of contours found = ', len(contours))
+
+        # handles the case of not detecting any objects
+        # changed only to countors because empty gives "()" and was giving an error
         if contours:
-            #if it finds objects, it will sort them from biggest to smallest
+            # if it finds objects, it will sort them from biggest to smallest
             sorted_contours= sorted(contours, key=cv2.contourArea, reverse= True)
-            #the biggest will be the first on the list
+            # the biggest will be the first on the list
             biggest_object = sorted_contours[0]
 
-            #list of all x coordinates for biggest_object edges
+            # list of all x coordinates for biggest_object edges
             center_x_raw=[coord[0][0] for coord in biggest_object]
-            #list of all y coordinates for biggest_object edges
+            # list of all y coordinates for biggest_object edges
             center_y_raw=[coord[0][1] for coord in biggest_object]
 
-            #avg x value, used as centroid x coord
+            # avg x value, used as centroid x coord
             center_x=int(sum(center_x_raw)/len(center_x_raw))
-            #avg y value, used as centroid y coord
+            # avg y value, used as centroid y coord
             center_y=int(sum(center_y_raw)/len(center_y_raw))
 
-            #drawing the marker for the centroid
+            # drawing the marker for the centroid
             cv2.circle(frame, (center_x, center_y), 10, (255,0,0), 5)
 
 def main():
@@ -110,7 +110,7 @@ def main():
         # converts frames to HSV
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         # creates the mask with the values
-        mask = cv2.inRange(gray, mins, maxs)
+        mask = cv2.inRange(frame, mins, maxs)
 
         #trying to use this to define edges of recognized objects and track only the biggest one
         edges = cv2.Canny(mask, 200, 180)

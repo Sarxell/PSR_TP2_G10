@@ -4,6 +4,7 @@ import json
 import numpy as np
 from functools import partial
 import copy
+from datetime import *
 from imutils.video import VideoStream
 
 drawing = False  # true if mouse is pressed
@@ -183,6 +184,12 @@ def main():
             if thickness == 0:
                 print('thickness cant be zero')
                 thickness = 1
+
+        # saves the image in the directory of the code
+        if key == ord('w'):
+            # didnt put weekday
+            date_img = datetime.now().strftime("%H:%M:%S_%Y")
+            cv2.imwrite('image_' + date_img + '.png', img)
 
         # quit the program
         if key == ord('q'):

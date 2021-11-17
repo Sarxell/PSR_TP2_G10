@@ -3,6 +3,7 @@ import cv2
 import json
 import numpy as np
 from functools import partial
+import copy
 from imutils.video import VideoStream
 
 drawing = False  # true if mouse is pressed
@@ -132,10 +133,13 @@ def main():
         mask = cv2.inRange(frame, mins, maxs)
 
         mask_size, x, y = removeSmallComponents(mask, 500)
+        # paint the biggest object in the original frame
+        frame_copy = copy.copy(frame)
+        frame_copy[(mask_size == 255)] = (0, 255, 0)
 
-        # drawing the marker for the centroid
+        # drawing the marker for the centroid, needs to be a cross
         if x:
-            cv2.circle(frame, (int(x), int(y)), 10, (0, 0, 255), 5)
+            cv2.circle(frame_copy, (int(x), int(y)), 10, (0, 0, 255), 5)
 
 
         mask_drawing(img, color, thickness, x, y)
@@ -144,6 +148,7 @@ def main():
 
         # show video, canvas, mask
         cv2.imshow('video', frame)
+        cv2.imshow('video_changed', frame_copy)
         cv2.imshow('canvas', img)
         cv2.imshow('mask', mask)
         cv2.imshow('mask_biggest object', mask_size)

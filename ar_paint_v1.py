@@ -7,6 +7,7 @@ import copy
 from datetime import *
 from imutils.video import VideoStream
 from enum import Enum
+import random
 
 drawing = False  # true if mouse is pressed
 pt1_x, pt1_y = None, None
@@ -15,17 +16,28 @@ copied_image=None
 flag = 0
 past_x, past_y = None, None
 
-#Enum for shapes allowed when drawing on canvas
+
+# Enum for shapes allowed when drawing on canvas
 class Shape(Enum):
-    RECTANGLE=1
-    CIRCLE=2
-    ELLIPSE=3
-    LINE=4
+    RECTANGLE = 1
+    CIRCLE = 2
+    ELLIPSE = 3
+    LINE = 4
+
+
+def accuracy(img_bw, img_color):
+    # cores para a criação de mascaras
+    #mask of green (36, 25, 25) ~ (86, 255, 255)
+    ## convert to hsv
+    hsv = cv2.cvtColor(img_bw, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, (36, 25, 25), (70, 255, 255))
+
+    cv2.imshow('green', mask)
 
 
 
 def removeSmallComponents(image, threshold):
-    #find all your connected components (white blobs in your image)
+    # find all your connected components (white blobs in your image)
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=8)
     sizes = stats[1:, -1]
     nb_components = nb_components - 1
@@ -33,7 +45,7 @@ def removeSmallComponents(image, threshold):
     y = None
     img2 = np.zeros(output.shape, dtype = np.uint8)
 
-    #for every component in the image, you keep it only if it's above threshold
+    # for every component in the image, you keep it only if it's above threshold
     for i in range(0, nb_components):
         if sizes[i] >= threshold:
             # to use the biggest
@@ -57,10 +69,11 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
         if drawing:
             if shape is Shape.RECTANGLE:
                 if not copied:
-                    copied_image=img.copy()
-                    copied=True
+                    copied_image = img.copy()
+                    copied = True
                 cv2.rectangle(copied_image,(pt1_x, pt1_y), (x,y), color, thickness)
-                #pt1_x, pt1_y = x, y
+                # copied_image = img.copy()
+                # pt1_x, pt1_y = x, y
                 cv2.imshow(w_name, copied_image)
             if shape is Shape.LINE:
                 cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
@@ -76,6 +89,9 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
             cv2.rectangle(img,(pt1_x, pt1_y), (x,y), color=color, thickness=thickness)
         cv2.imshow(w_name, img)
 
+    # after the rectangle, he disappears if the button wasnt pressed
+    copied_image = img.copy()
+
 # mouse callback function
 def mask_drawing(w_name, img, color, thickness, x, y):
     # flag to see if is a new line or not
@@ -87,7 +103,7 @@ def mask_drawing(w_name, img, color, thickness, x, y):
         y = int(y)
         # it means there is a new line
         if flag == 1:
-            cv2.line(img, (x,y), (x, y), color=color, thickness=thickness)
+            cv2.line(img, (x, y), (x, y), color=color, thickness=thickness)
             past_x = x
             past_y = y
             flag = 0
@@ -111,6 +127,10 @@ def main():
     parser.add_argument('-j', '--json', required=True, type=str, help='Full path to json file')
     args = vars(parser.parse_args())
 
+    # ----------------
+    # Inicializações
+    # ---------------
+
     # leitura do ficheiro json
     ranges = json.load(open(args['json']))
 
@@ -118,6 +138,9 @@ def main():
     # min and max values in the json file
     mins = np.array([ranges['B']['min'], ranges['G']['min'], ranges['R']['min']])
     maxs = np.array([ranges['B']['max'], ranges['G']['max'], ranges['R']['max']])
+
+    # dicionario do path da imagem
+    d = {'Ball_painted.jpg': 'Ball.jpg'}
 
     # setup da camera
     vs = VideoStream(0).start()
@@ -142,8 +165,8 @@ def main():
     # THICCCCCC
     thickness = 1
 
-    #Shape
-    shape=Shape.LINE
+    # Shape
+    shape = Shape.LINE
 
     """
     this block is just testing purposes
@@ -151,6 +174,10 @@ def main():
     cv2.setMouseCallback('mask', partial(line_drawing, img, color, thickness))
     cv2.setMouseCallback('video', partial(line_drawing, img, color, thickness))
     """
+
+    # ----------------
+    # Execucoes
+    # ---------------
 
     while True:
         frame = vs.read()
@@ -169,7 +196,6 @@ def main():
             cv2.line(frame_copy, (int(x)-10, int(y)+10), (int(x)+10, int(y)-10), (0,0,255), 5)
             cv2.line(frame_copy, (int(x) + 10, int(y)+10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
-
         mask_drawing(window_name, img, color, thickness, x, y)
 
         # show video, canvas, mask
@@ -181,9 +207,9 @@ def main():
         key = cv2.waitKey(1)
 
         # drawing in the canvas
-        #it is needed in the while for it to change color and thickness, or that or using global variables
+        # it is needed in the while for it to change color and thickness, or that or using global variables
         cv2.setMouseCallback('canvas', partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color, thickness=thickness))
-        #cv2.setMouseCallback('canvas', partial(shape_drawing, img, shape, color, thickness))
+        # cv2.setMouseCallback('canvas', partial(shape_drawing, img, shape, color, thickness))
 
         # it isnt needed
         # if key != -1:
@@ -211,23 +237,33 @@ def main():
                 thickness = 1
 
         #select shape for drawing on canvas
-        if key== ord('s'): #square
+        if key == ord('s'):  # square
             print("rectangle")
-            shape=Shape.RECTANGLE
-        if key== ord('f'):#circle
-            shape=Shape.CIRCLE
-        if key== ord('e'):#ellipse
-            shape=Shape.ELLIPSE
-        if key==ord('l'):#
+            shape = Shape.RECTANGLE
+        if key == ord('f'):  # circle
+            shape = Shape.CIRCLE
+        if key == ord('e'):  # ellipse
+            shape = Shape.ELLIPSE
+        if key == ord('l'):  #
             print("Line")
-            shape=Shape.LINE
+            shape = Shape.LINE
 
-        #capture image from videostream and set it on canvas to be drawn
+        # capture image from videostream and set it on canvas to be drawn
         if key == ord('p'):
-            img=frame
+            img = frame
             cv2.imshow(window_name, img)
 
-        # saves the image in the directory of the code
+        if key == ord('t'):
+            path_bw = random.choice(list(d.values()))
+            print(path_bw)
+            img = cv2.imread(path_bw)
+            cv2.imshow(window_name, img)
+            path_color = list(d.keys())[list(d.values()).index(path_bw)]
+            img_color = cv2.imread(path_color)
+            print(path_color)
+
+
+            # saves the image in the directory of the code
         if key == ord('w'):
             # didnt put weekday
             date_img = datetime.now().strftime("%H:%M:%S_%Y")
@@ -235,6 +271,9 @@ def main():
 
         # quit the program
         if key == ord('q'):
+            if not img_color is None:
+                accuracy(img, img_color)
+            cv2.waitKey(0)
             break
 
     cv2.destroyAllWindows()

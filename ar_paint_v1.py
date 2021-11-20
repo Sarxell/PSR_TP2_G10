@@ -101,7 +101,7 @@ def mask_drawing(w_name, img, color, thickness, x, y):
         # it starts to be a new line again
         flag = 1
 
-    #cv2.imshow(w_name, img)
+    cv2.imshow(w_name, img)
 
 
 
@@ -170,7 +170,7 @@ def main():
             cv2.line(frame_copy, (int(x) + 10, int(y)+10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
 
-        #mask_drawing(window_name, img, color, thickness, x, y)
+        mask_drawing(window_name, img, color, thickness, x, y)
 
         # show video, canvas, mask
         cv2.imshow('video', frame)

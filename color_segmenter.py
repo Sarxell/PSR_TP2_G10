@@ -36,7 +36,6 @@ def main():
     while True:
         _, frame = capture.read()
 
-
         mins = np.array([ranges['B']['min'], ranges['G']['min'], ranges['R']['min']])
         maxs = np.array([ranges['B']['max'], ranges['G']['max'], ranges['R']['max']])
 

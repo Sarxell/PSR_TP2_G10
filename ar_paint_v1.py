@@ -6,11 +6,22 @@ from functools import partial
 import copy
 from datetime import *
 from imutils.video import VideoStream
+from enum import Enum
 
 drawing = False  # true if mouse is pressed
 pt1_x, pt1_y = None, None
+copied=False
+copied_image=None
 flag = 0
 past_x, past_y = None, None
+
+#Enum for shapes allowed when drawing on canvas
+class Shape(Enum):
+    RECTANGLE=1
+    CIRCLE=2
+    ELLIPSE=3
+    LINE=4
+
 
 
 def removeSmallComponents(image, threshold):
@@ -34,9 +45,8 @@ def removeSmallComponents(image, threshold):
 
 
 # mouse callback function
-def line_drawing(img, color, thickness, event, x, y, flags, param):
-    global pt1_x, pt1_y, drawing
-
+def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness):
+    global pt1_x, pt1_y, drawing, copied, copied_image
     # user presses the left button
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
@@ -45,17 +55,29 @@ def line_drawing(img, color, thickness, event, x, y, flags, param):
     # starts drawing
     elif event == cv2.EVENT_MOUSEMOVE:
         if drawing:
-            cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
-            pt1_x, pt1_y = x, y
+            if shape is Shape.RECTANGLE:
+                if not copied:
+                    copied_image=img.copy()
+                    copied=True
+                cv2.rectangle(copied_image,(pt1_x, pt1_y), (x,y), color, thickness)
+                #pt1_x, pt1_y = x, y
+                cv2.imshow(w_name, copied_image)
+            if shape is Shape.LINE:
+                cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
+                pt1_x, pt1_y = x, y
+                cv2.imshow(w_name, img)
 
     # stops drawing
     elif event == cv2.EVENT_LBUTTONUP:
-        drawing = False
-        cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
-
+        drawing, copied = False, False
+        if shape is Shape.LINE:
+            cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
+        if shape is Shape.RECTANGLE:
+            cv2.rectangle(img,(pt1_x, pt1_y), (x,y), color=color, thickness=thickness)
+        cv2.imshow(w_name, img)
 
 # mouse callback function
-def mask_drawing(img, color, thickness, x, y):
+def mask_drawing(w_name, img, color, thickness, x, y):
     # flag to see if is a new line or not
     global flag
     global past_x, past_y
@@ -79,7 +101,7 @@ def mask_drawing(img, color, thickness, x, y):
         # it starts to be a new line again
         flag = 1
 
-
+    #cv2.imshow(w_name, img)
 
 
 
@@ -106,7 +128,8 @@ def main():
     # white canvas
     img = np.zeros((h, w, 3), np.uint8)
     img.fill(255)
-    cv2.imshow('canvas', img)
+    window_name='canvas'
+    cv2.imshow(window_name, img)
 
     # mask, gray e video só estou aqui para conseguir testar os mousecallbacks nessas janelas, são para ser removidos depois
     # cv2.imshow('gray', img)
@@ -118,6 +141,9 @@ def main():
 
     # THICCCCCC
     thickness = 1
+
+    #Shape
+    shape=Shape.LINE
 
     """
     this block is just testing purposes
@@ -144,14 +170,11 @@ def main():
             cv2.line(frame_copy, (int(x) + 10, int(y)+10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
 
-        mask_drawing(img, color, thickness, x, y)
-
-
+        #mask_drawing(window_name, img, color, thickness, x, y)
 
         # show video, canvas, mask
         cv2.imshow('video', frame)
         cv2.imshow('video_changed', frame_copy)
-        cv2.imshow('canvas', img)
         cv2.imshow('mask', mask)
         cv2.imshow('mask_biggest object', mask_size)
 
@@ -159,7 +182,8 @@ def main():
 
         # drawing in the canvas
         #it is needed in the while for it to change color and thickness, or that or using global variables
-        cv2.setMouseCallback('canvas', partial(line_drawing, img, color, thickness))
+        cv2.setMouseCallback('canvas', partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color, thickness=thickness))
+        #cv2.setMouseCallback('canvas', partial(shape_drawing, img, shape, color, thickness))
 
         # it isnt needed
         # if key != -1:
@@ -175,6 +199,7 @@ def main():
         # clear the board
         if key == ord('c'):
             img.fill(255)
+            cv2.imshow(window_name, img)
 
         # change the thickness
         if key == ord('+'):
@@ -184,6 +209,23 @@ def main():
             if thickness == 0:
                 print('thickness cant be zero')
                 thickness = 1
+
+        #select shape for drawing on canvas
+        if key== ord('s'): #square
+            print("rectangle")
+            shape=Shape.RECTANGLE
+        if key== ord('f'):#circle
+            shape=Shape.CIRCLE
+        if key== ord('e'):#ellipse
+            shape=Shape.ELLIPSE
+        if key==ord('l'):#
+            print("Line")
+            shape=Shape.LINE
+
+        #capture image from videostream and set it on canvas to be drawn
+        if key == ord('p'):
+            img=frame
+            cv2.imshow(window_name, img)
 
         # saves the image in the directory of the code
         if key == ord('w'):

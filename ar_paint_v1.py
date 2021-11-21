@@ -9,6 +9,9 @@ from colorama import Fore,Back, Style
 from imutils.video import VideoStream
 from enum import Enum
 import random
+import math
+
+from numpy.lib.function_base import _place_dispatcher
 
 drawing = False  # true if mouse is pressed
 pt1_x, pt1_y = None, None
@@ -16,6 +19,8 @@ copied=False
 copied_image=None
 flag = 0
 past_x, past_y = None, None
+holding=False
+finished=False
 
 
 # Enum for shapes allowed when drawing on canvas
@@ -112,12 +117,17 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
                     copied_image = img.copy()
                     copied = True
                 cv2.rectangle(copied_image,(pt1_x, pt1_y), (x,y), color, thickness)
-                # copied_image = img.copy()
-                # pt1_x, pt1_y = x, y
-                cv2.imshow(w_name, copied_image)
+            if shape is Shape.CIRCLE:
+                if not copied:
+                    copied_image = img.copy()
+                    copied = True
+                cv2.circle(copied_image,(pt1_x, pt1_y), int(math.sqrt(math.pow(x-pt1_x,2)+math.pow(y-pt1_y,2))), color, thickness)
             if shape is Shape.LINE:
                 cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
                 pt1_x, pt1_y = x, y
+            if copied:
+                cv2.imshow(w_name, copied_image)
+            else:
                 cv2.imshow(w_name, img)
 
     # stops drawing
@@ -127,37 +137,75 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
             cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
         if shape is Shape.RECTANGLE:
             cv2.rectangle(img,(pt1_x, pt1_y), (x,y), color=color, thickness=thickness)
+        if shape is Shape.CIRCLE:
+             cv2.circle(img,(pt1_x, pt1_y), int(math.sqrt(math.pow(x-pt1_x,2)+math.pow(y-pt1_y,2))), color, thickness)
+
         cv2.imshow(w_name, img)
+
+
 
     # after the rectangle, he disappears if the button wasnt pressed
     copied_image = img.copy()
 
 # mouse callback function
-def mask_drawing(w_name, img, color, thickness, x, y):
+def mask_drawing(w_name, img, color, thickness, x, y, shape):
     # flag to see if is a new line or not
-    global flag
+    global flag, holding, finished
+    global copied, copied_image
     global past_x, past_y
+    
+    if not holding:
+        if x:
+            x = int(x)
+            y = int(y)
+            # it means there is a new line
+            if flag == 1:
+                cv2.line(img, (x, y), (x, y), color=color, thickness=thickness)
+                past_x = x
+                past_y = y
+                flag = 0
+            else:
+                # if flag = 0 it's the same line
+                cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                past_x = x
+                past_y = y
 
-    if x:
-        x = int(x)
-        y = int(y)
-        # it means there is a new line
-        if flag == 1:
-            cv2.line(img, (x, y), (x, y), color=color, thickness=thickness)
-            past_x = x
-            past_y = y
-            flag = 0
         else:
-            # if flag = 0 it's the same line
-            cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
-            past_x = x
-            past_y = y
-
+            # it starts to be a new line again
+            flag = 1
+        
     else:
-        # it starts to be a new line again
-        flag = 1
+        if x:
+            x = int(x)
+            y = int(y)
+            if not finished:
+                copied=True
+                copied_image=img.copy()
+            if shape is Shape.RECTANGLE:
+                cv2.rectangle(copied_image,(past_x, past_y), (x,y), color, thickness)
+            if shape is Shape.CIRCLE:
+                cv2.circle(copied_image,(past_x, past_y), int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2))), color, thickness)
 
-    cv2.imshow(w_name, img)
+    if finished:
+        finished=False
+        copied=False
+        img=copied_image.copy()
+            
+    if copied:
+        cv2.imshow(w_name, copied_image)
+    else:
+        cv2.imshow(w_name, img)
+
+
+#
+def detect_holding(event, x, y, flags, params):
+    global holding, finished
+    if event == cv2.EVENT_RBUTTONDOWN:
+        holding=True
+
+    if event == cv2.EVENT_RBUTTONUP:
+        holding=False
+        finished=True
 
 #NOT FINISHED
 def shake_prevention(x, y, color, w_name, img):
@@ -223,6 +271,9 @@ def main():
     # Shape
     shape = Shape.LINE
 
+    #Juntei para evitar os erros nos testes acionados ao premir a tecla q
+    img_color=None
+
     """
     this block is just testing purposes
     cv2.setMouseCallback('gray', partial(line_drawing, img, color, thickness))
@@ -236,6 +287,7 @@ def main():
 
     while True:
         frame = vs.read()
+        frame=cv2.flip(frame, 1)    #the second arguments value of 1 indicates that we want to flip horizontally
         # converts frames to HSV
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         # creates the mask with the values
@@ -251,7 +303,7 @@ def main():
             cv2.line(frame_copy, (int(x)-10, int(y)+10), (int(x)+10, int(y)-10), (0,0,255), 5)
             cv2.line(frame_copy, (int(x) + 10, int(y)+10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
-        mask_drawing(window_name, img, color, thickness, x, y)
+        mask_drawing(window_name, img, color, thickness, x, y, shape)
 
         # show video, canvas, mask
         cv2.imshow('video', frame)
@@ -267,7 +319,7 @@ def main():
         # drawing in the canvas
         # it is needed in the while for it to change color and thickness, or that or using global variables
         cv2.setMouseCallback('canvas', partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color, thickness=thickness))
-        # cv2.setMouseCallback('canvas', partial(shape_drawing, img, shape, color, thickness))
+        cv2.setMouseCallback('canvas', partial(detect_holding))
 
         # it isnt needed
         # if key != -1:
@@ -299,6 +351,7 @@ def main():
             print("rectangle")
             shape = Shape.RECTANGLE
         if key == ord('f'):  # circle
+            print("circle")
             shape = Shape.CIRCLE
         if key == ord('e'):  # ellipse
             shape = Shape.ELLIPSE

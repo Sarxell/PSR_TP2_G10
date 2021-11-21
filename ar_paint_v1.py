@@ -119,12 +119,27 @@ def mask_drawing(w_name, img, color, thickness, x, y):
 
     cv2.imshow(w_name, img)
 
+#NOT FINISHED
+def shake_prevention(x, y, color, w_name, img):
+    global past_x, past_y
+    #print('X     ' + str(x))
+    #print('PAST     ' + str(past_x))
+
+    if x and y:
+        if (x - past_x) > 30 or (y - past_y) > 30:
+            cv2.circle(img, (x,y), radius=0, color=color, thickness=-1)
+            cv2.imshow(w_name, img)
+
+
+
 
 
 def main():
     global flag
     parser = argparse.ArgumentParser(description='OPenCV example')
     parser.add_argument('-j', '--json', required=True, type=str, help='Full path to json file')
+    parser.add_argument('-sp', '--use_shake_prevention', action = 'store_true', help='Applies shake detection to the program')
+
     args = vars(parser.parse_args())
 
     # ----------------
@@ -205,6 +220,9 @@ def main():
         cv2.imshow('mask_biggest object', mask_size)
 
         key = cv2.waitKey(1)
+
+        if args['use_shake_prevention'] is True:
+            shake_prevention(x, y, color, window_name, img)
 
         # drawing in the canvas
         # it is needed in the while for it to change color and thickness, or that or using global variables

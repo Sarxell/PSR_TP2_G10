@@ -28,11 +28,14 @@ class Shape(Enum):
 def accuracy(img_bw, img_color):
     # cores para a criação de mascaras
     #mask of green (36, 25, 25) ~ (86, 255, 255)
-    ## convert to hsv
-    hsv = cv2.cvtColor(img_bw, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, (36, 25, 25), (70, 255, 255))
+    ## convert to hsv both our drawing and the painted one
+    hsv_bw = cv2.cvtColor(img_bw, cv2.COLOR_BGR2HSV)
+    mask_bw = cv2.inRange(hsv_bw, (36, 25, 25), (70, 255, 255))
+    hsv_color = cv2.cvtColor(img_color, cv2.COLOR_BGR2HSV)
+    mask_color = cv2.inRange(hsv_color, (36, 30, 30), (70, 255, 255))
 
-    cv2.imshow('green', mask)
+    cv2.imshow('green', mask_bw)
+    cv2.imshow('green_painted', mask_color)
 
 
 
@@ -149,7 +152,7 @@ def main():
     # leitura do ficheiro json
     ranges = json.load(open(args['json']))
 
-    print(ranges)
+    # print(ranges)
     # min and max values in the json file
     mins = np.array([ranges['B']['min'], ranges['G']['min'], ranges['R']['min']])
     maxs = np.array([ranges['B']['max'], ranges['G']['max'], ranges['R']['max']])
@@ -207,7 +210,7 @@ def main():
         frame_copy[(mask_size == 255)] = (0, 255, 0)
 
         # drawing the marker for the centroid, it is a cross
-        if x:
+        if x is not None:
             cv2.line(frame_copy, (int(x)-10, int(y)+10), (int(x)+10, int(y)-10), (0,0,255), 5)
             cv2.line(frame_copy, (int(x) + 10, int(y)+10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
@@ -289,7 +292,7 @@ def main():
 
         # quit the program
         if key == ord('q'):
-            if not img_color is None:
+            if img_color is not None:
                 accuracy(img, img_color)
             cv2.waitKey(0)
             break

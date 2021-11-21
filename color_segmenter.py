@@ -4,7 +4,7 @@ import json
 import cv2
 
 def onTrackBar(value, channel, min_max, ranges):
-    ranges[channel][min_max]=value
+    ranges[channel][min_max] = value
 
 def main():
     
@@ -35,11 +35,13 @@ def main():
 
     while True:
         _, frame = capture.read()
+        # HSV convert
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         mins = np.array([ranges['B']['min'], ranges['G']['min'], ranges['R']['min']])
         maxs = np.array([ranges['B']['max'], ranges['G']['max'], ranges['R']['max']])
 
-        mask = cv2.inRange(frame, mins, maxs)
+        mask = cv2.inRange(hsv, mins, maxs)
 
         cv2.imshow(segmented_window, mask)
 

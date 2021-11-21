@@ -44,7 +44,7 @@ def main():
         _, frame = capture.read()
         cv2.imshow(window_name, frame)
         # HSV convert
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
         # getting the values of the trackbars
         # places the value in the dictionary
@@ -56,7 +56,7 @@ def main():
         ranges['R']['max'] = maxs[2] = cv2.getTrackbarPos('max R/V', segmented_window)
 
         # creates the mask with the values
-        mask = cv2.inRange(gray, mins, maxs)
+        mask = cv2.inRange(hsv, mins, maxs)
         cv2.imshow(segmented_window, mask)
 
         #reading keys

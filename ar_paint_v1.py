@@ -5,6 +5,7 @@ import numpy as np
 from functools import partial
 import copy
 from datetime import *
+from colorama import Fore,Back, Style
 from imutils.video import VideoStream
 from enum import Enum
 import random
@@ -26,28 +27,48 @@ class Shape(Enum):
 
 
 def accuracy(img_bw, img_color):
-    # cores para a criação de mascaras
-    #mask of green (36, 25, 25) ~ (86, 255, 255)
     ## convert to hsv both our drawing and the painted one
     hsv_bw = cv2.cvtColor(img_bw, cv2.COLOR_BGR2HSV)
-    b, g, r = cv2.split(img_bw)
-    b_color, g_color, r_color = cv2.split(img_color)
-    # mask_bw = cv2.inRange(hsv_bw, (36, 25, 25), (70, 255, 255))
-    # hsv_color = cv2.cvtColor(img_color, cv2.COLOR_BGR2HSV)
-    # mask_color = cv2.inRange(hsv_color, (36, 25, 25), (70, 255, 255))
+    g = cv2.inRange(hsv_bw, (36, 25, 25), (70, 255, 255))
+    b = cv2.inRange(hsv_bw, (94, 80, 2), (126, 255, 255))
+    r = cv2.inRange(hsv_bw, (161, 155, 84), (179, 255, 255))
+    hsv_color = cv2.cvtColor(img_color, cv2.COLOR_BGR2HSV)
+    g_color = cv2.inRange(hsv_color, (36, 25, 25), (70, 255, 255))
+    b_color = cv2.inRange(hsv_color, (94, 80, 2), (126, 255, 255))
+    r_color = cv2.inRange(hsv_color, (161, 155, 84), (179, 255, 255))
 
     # we also need to remove the small components from the painted mask
     g_color, _, _ = removeSmallComponents(g_color, threshold=50)
+    b_color, _, _ = removeSmallComponents(b_color, threshold=50)
+    r_color, _, _ = removeSmallComponents(r_color, threshold=50)
+
+    # the masks of every color
     # the part painted that is right
     bitwiseAnd_g = cv2.bitwise_and(g_color, g)
-    # ALL THE GRREN PAINT
+    bitwiseAnd_r = cv2.bitwise_and(r_color, r)
+    bitwiseAnd_b = cv2.bitwise_and(b_color, b)
+    # ALL THE Paint
     bitwiseOr_g = cv2.bitwise_or(g_color, g)
+    bitwiseOr_r = cv2.bitwise_or(r_color, r)
+    bitwiseOr_b = cv2.bitwise_or(b_color, b)
 
+    # calculus
     green_painted = sum(sum(bitwiseAnd_g))
     total_green = sum(sum(bitwiseOr_g))
     acc_green = green_painted/total_green*100
+    blue_painted = sum(sum(bitwiseAnd_b))
+    total_blue = sum(sum(bitwiseOr_b))
+    acc_blue = blue_painted/total_blue*100
+    red_painted = sum(sum(bitwiseAnd_r))
+    total_red = sum(sum(bitwiseOr_r))
+    acc_red = red_painted/total_red*100
 
-    print('Your accuracy was ' + str(acc_green))
+    total_acc = (blue_painted + green_painted + red_painted)/(total_red+total_blue+total_green)*100
+
+    print('Your blue accuracy was ' + str(acc_blue))
+    print('Your green accuracy was ' + str(acc_green))
+    print('Your red accuracy was ' + str(acc_red))
+    print('Your total accuracy was ' + str(total_acc))
 
     cv2.imshow('green_together', bitwiseAnd_g)
     cv2.imshow('green_total', bitwiseOr_g)
@@ -311,7 +332,7 @@ def main():
         if key == ord('q'):
             if img_color is not None:
                 accuracy(img, img_color)
-            cv2.waitKey(0)
+                cv2.waitKey(0)
             break
 
     cv2.destroyAllWindows()

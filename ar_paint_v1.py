@@ -30,24 +30,27 @@ def accuracy(img_bw, img_color):
     #mask of green (36, 25, 25) ~ (86, 255, 255)
     ## convert to hsv both our drawing and the painted one
     hsv_bw = cv2.cvtColor(img_bw, cv2.COLOR_BGR2HSV)
-    mask_bw = cv2.inRange(hsv_bw, (36, 25, 25), (70, 255, 255))
-    hsv_color = cv2.cvtColor(img_color, cv2.COLOR_BGR2HSV)
-    mask_color = cv2.inRange(hsv_color, (36, 25, 25), (70, 255, 255))
+    b, g, r = cv2.split(img_bw)
+    b_color, g_color, r_color = cv2.split(img_color)
+    # mask_bw = cv2.inRange(hsv_bw, (36, 25, 25), (70, 255, 255))
+    # hsv_color = cv2.cvtColor(img_color, cv2.COLOR_BGR2HSV)
+    # mask_color = cv2.inRange(hsv_color, (36, 25, 25), (70, 255, 255))
+
     # we also need to remove the small components from the painted mask
-    mask_color, _, _ = removeSmallComponents(mask_color, threshold=50)
+    g_color, _, _ = removeSmallComponents(g_color, threshold=50)
     # the part painted that is right
-    bitwiseAnd = cv2.bitwise_and(mask_color, mask_bw)
+    bitwiseAnd_g = cv2.bitwise_and(g_color, g)
     # ALL THE GRREN PAINT
-    bitwiseOr = cv2.bitwise_or(mask_color, mask_bw)
+    bitwiseOr_g = cv2.bitwise_or(g_color, g)
 
-    green_painted = sum(sum(bitwiseAnd))
-    total_green = sum(sum(bitwiseOr))
-    acc = green_painted/total_green*100
+    green_painted = sum(sum(bitwiseAnd_g))
+    total_green = sum(sum(bitwiseOr_g))
+    acc_green = green_painted/total_green*100
 
-    print('Your accuracy was ' + str(acc))
+    print('Your accuracy was ' + str(acc_green))
 
-    cv2.imshow('green_together', bitwiseAnd)
-    cv2.imshow('green_total', bitwiseOr)
+    cv2.imshow('green_together', bitwiseAnd_g)
+    cv2.imshow('green_total', bitwiseOr_g)
 
 
 

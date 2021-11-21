@@ -212,11 +212,11 @@ def shake_prevention(x, y,past_x, past_y):
     #print('X     ' + str(x))
     #print('PAST     ' + str(past_x))
     #Distancia ponto atual ao ponto anterior
-    # dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
+    dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
 
     #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
-    # if dist > 50:
-    #     return True
+    if dist > 50:
+        return True
     return False
 
 
@@ -225,7 +225,6 @@ def shake_prevention(x, y,past_x, past_y):
 
 def main():
     global flag
-    video_flag = 0
     parser = argparse.ArgumentParser(description='OPenCV example')
     parser.add_argument('-j', '--json', required=True, type=str, help='Full path to json file')
     parser.add_argument('-sp', '--use_shake_prevention', action = 'store_true', help='Applies shake detection to the program')
@@ -245,9 +244,7 @@ def main():
     maxs = np.array([ranges['B']['max'], ranges['G']['max'], ranges['R']['max']])
 
     # dicionario do path da imagem
-    d = {'Ball_painted.jpg': 'Ball.jpg',
-         'amongus_painted.jpg': 'amongus.jpg',
-         'snail_painted.jpg': 'snail.jpg'}
+    d = {'Ball_painted.jpg': 'Ball.jpg'}
 
     # setup da camera
     vs = VideoStream(0).start()
@@ -284,7 +281,6 @@ def main():
     cv2.setMouseCallback('mask', partial(line_drawing, img, color, thickness))
     cv2.setMouseCallback('video', partial(line_drawing, img, color, thickness))
     """
-    video = copy.copy(frame)
 
     # ----------------
     # Execucoes
@@ -308,32 +304,22 @@ def main():
             cv2.line(frame_copy, (int(x)-10, int(y)+10), (int(x)+10, int(y)-10), (0,0,255), 5)
             cv2.line(frame_copy, (int(x) + 10, int(y)+10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
-        # drawing in the canvas
-        if video_flag:
-            mask_drawing(window_name, video, color, thickness, x, y, shape)
-            cv2.setMouseCallback('canvas', partial(line_drawing, w_name=window_name, img=video, shape=shape, color=color,
-                                                   thickness=thickness))
-        else:
-            mask_drawing(window_name, img, color, thickness, x, y, shape)
-            cv2.setMouseCallback('canvas',
-                                 partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,
-                                         thickness=thickness))
+        mask_drawing(window_name, img, color, thickness, x, y, shape)
 
         # show video, canvas, mask
         cv2.imshow('video', frame)
         cv2.imshow('video_changed', frame_copy)
         cv2.imshow('mask', mask)
         cv2.imshow('mask_biggest object', mask_size)
-        if video_flag:
-            video = copy.copy(frame)
-            video[(img != 255)] = img[(img != 255)]
-            cv2.imshow(window_name, video)
 
         key = cv2.waitKey(1)
 
         #if args['use_shake_prevention'] is True:
         #    shake_prevention(x, y, color, window_name, img)
 
+        # drawing in the canvas
+        # it is needed in the while for it to change color and thickness, or that or using global variables
+        cv2.setMouseCallback('canvas', partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color, thickness=thickness))
 
         # it isnt needed
         # if key != -1:
@@ -377,12 +363,6 @@ def main():
         if key == ord('p'):
             img = frame
             cv2.imshow(window_name, img)
-
-        # get a video in the canvas
-        if key == ord('m'):
-            video_flag = not video_flag
-            print(video_flag)
-
 
         if key == ord('t'):
             path_bw = random.choice(list(d.values()))

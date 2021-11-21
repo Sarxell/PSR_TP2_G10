@@ -17,6 +17,7 @@ drawing = False  # true if mouse is pressed
 pt1_x, pt1_y = None, None
 copied=False
 copied_image=None
+copied_image_2=None
 flag = 0
 past_x, past_y = None, None
 holding=False
@@ -104,6 +105,7 @@ def removeSmallComponents(image, threshold):
 # mouse callback function
 def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness):
     global pt1_x, pt1_y, drawing, copied, copied_image
+    global holding, finished
     # user presses the left button
     if event == cv2.EVENT_LBUTTONDOWN:
         drawing = True
@@ -141,6 +143,13 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
              cv2.circle(img,(pt1_x, pt1_y), int(math.sqrt(math.pow(x-pt1_x,2)+math.pow(y-pt1_y,2))), color, thickness)
 
         cv2.imshow(w_name, img)
+
+    if event == cv2.EVENT_RBUTTONDOWN:
+        holding=True
+
+    if event == cv2.EVENT_RBUTTONUP:
+        holding=False
+        finished=True
 
 
 
@@ -195,17 +204,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
         cv2.imshow(w_name, copied_image)
     else:
         cv2.imshow(w_name, img)
-
-
-#
-def detect_holding(event, x, y, flags, params):
-    global holding, finished
-    if event == cv2.EVENT_RBUTTONDOWN:
-        holding=True
-
-    if event == cv2.EVENT_RBUTTONUP:
-        holding=False
-        finished=True
+   
 
 #NOT FINISHED
 def shake_prevention(x, y, color, w_name, img):
@@ -319,7 +318,6 @@ def main():
         # drawing in the canvas
         # it is needed in the while for it to change color and thickness, or that or using global variables
         cv2.setMouseCallback('canvas', partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color, thickness=thickness))
-        cv2.setMouseCallback('canvas', partial(detect_holding))
 
         # it isnt needed
         # if key != -1:

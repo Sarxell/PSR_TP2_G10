@@ -237,9 +237,9 @@ def main():
     while True:
         frame = vs.read()
         # converts frames to HSV
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         # creates the mask with the values
-        mask = cv2.inRange(frame, mins, maxs)
+        mask = cv2.inRange(hsv, mins, maxs)
 
         mask_size, x, y = removeSmallComponents(mask, 500)
         # paint the biggest object in the original frame

@@ -30,17 +30,17 @@ def accuracy(img_bw, img_color):
     ## convert to hsv both our drawing and the painted one
     hsv_bw = cv2.cvtColor(img_bw, cv2.COLOR_BGR2HSV)
     g = cv2.inRange(hsv_bw, (36, 25, 25), (70, 255, 255))
-    b = cv2.inRange(hsv_bw, (94, 80, 2), (126, 255, 255))
-    r = cv2.inRange(hsv_bw, (161, 155, 84), (179, 255, 255))
+    b = cv2.inRange(hsv_bw, (110, 50, 50), (130, 255, 255))
+    r = cv2.inRange(hsv_bw, (0, 50, 70), (9, 255, 255))
     hsv_color = cv2.cvtColor(img_color, cv2.COLOR_BGR2HSV)
     g_color = cv2.inRange(hsv_color, (36, 25, 25), (70, 255, 255))
     b_color = cv2.inRange(hsv_color, (94, 80, 2), (126, 255, 255))
-    r_color = cv2.inRange(hsv_color, (161, 155, 84), (179, 255, 255))
+    r_color = cv2.inRange(hsv_color, (159, 50, 70), (180, 255, 255))
 
     # we also need to remove the small components from the painted mask
-    g_color, _, _ = removeSmallComponents(g_color, threshold=50)
-    b_color, _, _ = removeSmallComponents(b_color, threshold=50)
-    r_color, _, _ = removeSmallComponents(r_color, threshold=50)
+    g_color, _, _ = removeSmallComponents(g_color, threshold=20)
+    b_color, _, _ = removeSmallComponents(b_color, threshold=20)
+    r_color, _, _ = removeSmallComponents(r_color, threshold=20)
 
     # the masks of every color
     # the part painted that is right
@@ -56,9 +56,11 @@ def accuracy(img_bw, img_color):
     green_painted = sum(sum(bitwiseAnd_g))
     total_green = sum(sum(bitwiseOr_g))
     acc_green = green_painted/total_green*100
+
     blue_painted = sum(sum(bitwiseAnd_b))
     total_blue = sum(sum(bitwiseOr_b))
     acc_blue = blue_painted/total_blue*100
+
     red_painted = sum(sum(bitwiseAnd_r))
     total_red = sum(sum(bitwiseOr_r))
     acc_red = red_painted/total_red*100
@@ -70,8 +72,8 @@ def accuracy(img_bw, img_color):
     print('Your red accuracy was ' + str(acc_red))
     print('Your total accuracy was ' + str(total_acc))
 
-    cv2.imshow('green_together', bitwiseAnd_g)
-    cv2.imshow('green_total', bitwiseOr_g)
+    cv2.imshow('green_together', bitwiseAnd_b)
+    cv2.imshow('green_total', bitwiseOr_b)
 
 
 

@@ -32,10 +32,24 @@ def accuracy(img_bw, img_color):
     hsv_bw = cv2.cvtColor(img_bw, cv2.COLOR_BGR2HSV)
     mask_bw = cv2.inRange(hsv_bw, (36, 25, 25), (70, 255, 255))
     hsv_color = cv2.cvtColor(img_color, cv2.COLOR_BGR2HSV)
-    mask_color = cv2.inRange(hsv_color, (36, 30, 30), (70, 255, 255))
+    mask_color = cv2.inRange(hsv_color, (36, 25, 25), (70, 255, 255))
+    # we also need to remove the small components from the painted mask
+    mask_color, _, _ = removeSmallComponents(mask_color, threshold=50)
+    # the part painted that is right
+    bitwiseAnd = cv2.bitwise_and(mask_color, mask_bw)
+    # ALL THE GRREN PAINT
+    bitwiseOr = cv2.bitwise_or(mask_color, mask_bw)
 
-    cv2.imshow('green', mask_bw)
-    cv2.imshow('green_painted', mask_color)
+    green_painted = sum(sum(bitwiseAnd))
+    total_green = sum(sum(bitwiseOr))
+    acc = green_painted/total_green*100
+
+    print('Your accuracy was ' + str(acc))
+
+    cv2.imshow('green_together', bitwiseAnd)
+    cv2.imshow('green_total', bitwiseOr)
+
+
 
 
 

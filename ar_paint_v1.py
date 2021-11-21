@@ -173,10 +173,10 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                 flag = 0
             else:
                 # if flag = 0 it's the same line
-                if not shake_prevention(x, y, past_x, past_y):
-                    cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
-                past_x = x
-                past_y = y
+                if not shake_prevention(x,y, past_x, past_y, color, img):
+                    cv2.line(img, (int(past_x), int(past_y)), (x, y), color=color, thickness=thickness)
+                    past_x = x
+                    past_y = y
 
         else:
             # it starts to be a new line again
@@ -207,16 +207,17 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
    
 
 #NOT FINISHED
-def shake_prevention(x, y,past_x, past_y):
+def shake_prevention(x, y,past_x, past_y, color, img):
     #print('X     ' + str(x))
     #print('PAST     ' + str(past_x))
     #Distancia ponto atual ao ponto anterior
-    dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
-
-    #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é
-    if dist > 50:
-        return True
-    return False
+    if past_x and past_y:
+        dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
+        #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
+        if dist > 50:
+            cv2.circle(img, (x, y), radius = 0, color=color, thickness=-1)
+            return True
+        return False
 
 
 def main():

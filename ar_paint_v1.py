@@ -72,9 +72,6 @@ def accuracy(img_bw, img_color):
     print('Your red accuracy was ' + str(acc_red))
     print('Your total accuracy was ' + str(total_acc))
 
-    cv2.imshow('green_together', bitwiseAnd_b)
-    cv2.imshow('green_total', bitwiseOr_b)
-
 
 
 
@@ -334,7 +331,6 @@ def main():
         if key == ord('q'):
             if img_color is not None:
                 accuracy(img, img_color)
-                cv2.waitKey(0)
             break
 
     cv2.destroyAllWindows()

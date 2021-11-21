@@ -175,7 +175,8 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                 flag = 0
             else:
                 # if flag = 0 it's the same line
-                cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                if not shake_prevention(x,y, past_x, past_y):
+                    cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
                 past_x = x
                 past_y = y
 
@@ -207,15 +208,16 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
    
 
 #NOT FINISHED
-def shake_prevention(x, y, color, w_name, img):
-    global past_x, past_y
+def shake_prevention(x, y,past_x, past_y):
     #print('X     ' + str(x))
     #print('PAST     ' + str(past_x))
+    #Distancia ponto atual ao ponto anterior
+    dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
 
-    if x and y:
-        if (x - past_x) > 30 or (y - past_y) > 30:
-            cv2.circle(img, (x,y), radius=0, color=color, thickness=-1)
-            cv2.imshow(w_name, img)
+    #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
+    if dist > 50:
+        return True
+    return False
 
 
 
@@ -312,8 +314,8 @@ def main():
 
         key = cv2.waitKey(1)
 
-        if args['use_shake_prevention'] is True:
-            shake_prevention(x, y, color, window_name, img)
+        #if args['use_shake_prevention'] is True:
+        #    shake_prevention(x, y, color, window_name, img)
 
         # drawing in the canvas
         # it is needed in the while for it to change color and thickness, or that or using global variables

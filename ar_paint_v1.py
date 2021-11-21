@@ -380,10 +380,12 @@ def main():
             date_img = datetime.now().strftime("%H:%M:%S_%Y")
             cv2.imwrite('image_' + date_img + '.png', img)
 
-        # quit the program
-        if key == ord('q'):
+        if key == ord('v'):
             if img_color is not None:
                 accuracy(img, img_color)
+
+        # quit the program
+        if key == ord('q'):
             break
 
     cv2.destroyAllWindows()

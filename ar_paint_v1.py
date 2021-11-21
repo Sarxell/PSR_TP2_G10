@@ -306,16 +306,15 @@ def main():
             cv2.line(frame_copy, (int(x) + 10, int(y) + 10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
         # drawing in the canvas
-        if video_flag:
+        if video_flag is True:
             mask_drawing(window_name, video, color, thickness, x, y, shape)
             cv2.setMouseCallback('canvas',
                                  partial(line_drawing, w_name=window_name, img=video, shape=shape, color=color,
                                          thickness=thickness))
-        else:
-            mask_drawing(window_name, img, color, thickness, x, y, shape)
-            cv2.setMouseCallback('canvas',
-                                 partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,
-                                         thickness=thickness))
+        mask_drawing(window_name, img, color, thickness, x, y, shape)
+        cv2.setMouseCallback('canvas',
+                             partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,
+                                     thickness=thickness))
 
         # show video, canvas, mask
         cv2.imshow('video', frame)

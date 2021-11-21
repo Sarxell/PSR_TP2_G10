@@ -204,18 +204,18 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
         cv2.imshow(w_name, copied_image)
     else:
         cv2.imshow(w_name, img)
+   
 
+#NOT FINISHED
+def shake_prevention(x, y,past_x, past_y):
+    #print('X     ' + str(x))
+    #print('PAST     ' + str(past_x))
+    #Distancia ponto atual ao ponto anterior
+    dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
 
-# NOT FINISHED
-def shake_prevention(x, y, past_x, past_y):
-    # print('X     ' + str(x))
-    # print('PAST     ' + str(past_x))
-    # Distancia ponto atual ao ponto anterior
-    # dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
-
-    # Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
-    # if dist > 50:
-    #     return True
+    #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é
+    if dist > 50:
+        return True
     return False
 
 

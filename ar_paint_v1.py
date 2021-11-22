@@ -193,9 +193,9 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                 copied = True
                 copied_image = img.copy()
             if shape is Shape.RECTANGLE:
-                cv2.rectangle(copied_image , (past_x, past_y), (x, y), color, thickness)
+                cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
-                cv2.circle(copied_image , (past_x, past_y),
+                cv2.circle(copied_image, (past_x, past_y),
                            int(math.sqrt(math.pow(x - past_x, 2) + math.pow(y - past_y, 2))), color, thickness)
 
     if finished:
@@ -213,13 +213,13 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
         cv2.imshow(w_name, img)
    
 
-def shake_prevention(x, y,past_x, past_y, color, img):
-    #print('X     ' + str(x))
-    #print('PAST     ' + str(past_x))
-    #Distancia ponto atual ao ponto anterior
+def shake_prevention(x, y, past_x, past_y, color, img):
+    # print('X     ' + str(x))
+    # print('PAST     ' + str(past_x))
+    # Distancia ponto atual ao ponto anterior
     if past_x and past_y:
-        dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
-        #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
+        dist = int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
+        # Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
         if dist > 200:
             cv2.circle(img, (x, y), radius = 0, color=color, thickness=-1)
             return True
@@ -304,6 +304,7 @@ def main():
         mask_size, x, y = removeSmallComponents(mask, 500)
         # paint the biggest object in the original frame
         frame_copy = copy.copy(frame)
+        video = frame.copy()
         frame_copy[(mask_size == 255)] = (0, 255, 0)
 
         # drawing the marker for the centroid, it is a cross
@@ -312,25 +313,31 @@ def main():
             cv2.line(frame_copy, (int(x) + 10, int(y) + 10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
         # drawing in the canvas
+        if video_flag:
+            mask_drawing(window_name, video, color, thickness, x, y, shape)
+            video = cv2.setMouseCallback('canvas',
+                                 partial(line_drawing, w_name=window_name, img=video, shape=shape, color=color,
+                                         thickness=thickness))
+
         mask_drawing(window_name, img, color, thickness, x, y, shape)
         cv2.setMouseCallback('canvas',
                              partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,
                                      thickness=thickness))
 
         # show video, canvas, mask
+
         cv2.imshow('video', frame)
         cv2.imshow('video_changed', frame_copy)
         cv2.imshow('mask', mask)
         cv2.imshow('mask_biggest object', mask_size)
         if video_flag:
-            video = copy.copy(frame)
             video[(img != 255)] = img[(img != 255)]
             cv2.imshow(window_name, video)
 
         key = cv2.waitKey(1)
 
         if args['use_shake_prevention'] is True:
-            shake_prevention(x, y,past_x, past_y, color, img)
+            shake_prevention(x, y, past_x, past_y, color, img)
 
         # it isnt needed
         # if key != -1:
@@ -378,7 +385,6 @@ def main():
         # get a video in the canvas
         if key == ord('m'):
             video_flag = not video_flag
-            print(video_flag)
 
         if key == ord('t'):
             path_bw = random.choice(list(d.values()))

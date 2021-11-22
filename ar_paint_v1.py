@@ -127,6 +127,7 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
             if shape is Shape.LINE:
                 cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
                 pt1_x, pt1_y = x, y
+
             if copied:
                 cv2.imshow(w_name, copied_image)
             else:
@@ -145,14 +146,13 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
 
         cv2.imshow(w_name, img)
 
-    if event == cv2.EVENT_RBUTTONDOWN:
-        holding = not holding
+    if event == cv2.EVENT_MBUTTONDOWN:
+        holding = True
+        finished = False
 
-    if event == cv2.EVENT_RBUTTONUP:
+    if event == cv2.EVENT_MBUTTONUP:
         holding = False
         finished = True
-
-
 
 
 # mouse callback function
@@ -188,20 +188,24 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
         if x:
             x = int(x)
             y = int(y)
+            copied_image = img.copy()
             if not finished:
                 copied = True
                 copied_image = img.copy()
             if shape is Shape.RECTANGLE:
-                cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
+                cv2.rectangle(copied_image , (past_x, past_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
-                cv2.circle(copied_image, (past_x, past_y),
+                cv2.circle(copied_image , (past_x, past_y),
                            int(math.sqrt(math.pow(x - past_x, 2) + math.pow(y - past_y, 2))), color, thickness)
-
 
     if finished:
         finished = False
         copied = False
-        img = copy.copy(copied_image)
+        if shape is Shape.RECTANGLE:
+            cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
+        if shape is Shape.CIRCLE:
+            cv2.circle(img, (past_x, past_y),
+                       int(math.sqrt(math.pow(x - past_x, 2) + math.pow(y - past_y, 2))), color, thickness)
 
     if copied:
         cv2.imshow(w_name, copied_image)
@@ -276,7 +280,7 @@ def main():
     shape = Shape.LINE
 
     # Juntei para evitar os erros nos testes acionados ao premir a tecla q
-    img_color = None
+    # img_color = None
 
     """
     this block is just testing purposes

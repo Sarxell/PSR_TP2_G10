@@ -220,7 +220,7 @@ def shake_prevention(x, y, past_x, past_y, color, img):
     if past_x and past_y and x and y:
         dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
         #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
-        if dist > 200:
+        if dist > 500:
             x = int(np.float32(x))
             y = int(np.float32(y))
             cv2.circle(img, (x, y), radius = 0, color=color, thickness=-1)

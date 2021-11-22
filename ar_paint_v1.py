@@ -111,6 +111,8 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
     # starts drawing
     elif event == cv2.EVENT_MOUSEMOVE:
         if drawing:
+            # after the rectangle, he disappears if the button wasnt pressed
+            copied_image = img.copy()
             if shape is Shape.RECTANGLE:
                 if not copied:
                     copied_image = img.copy()
@@ -144,14 +146,13 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
         cv2.imshow(w_name, img)
 
     if event == cv2.EVENT_RBUTTONDOWN:
-        holding = True
+        holding = not holding
 
     if event == cv2.EVENT_RBUTTONUP:
         holding = False
         finished = True
 
-    # after the rectangle, he disappears if the button wasnt pressed
-    copied_image = img.copy()
+
 
 
 # mouse callback function
@@ -174,7 +175,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
             else:
                 # if flag = 0 it's the same line
                 if not shake_prevention(x,y, past_x, past_y, color, img):
-                    cv2.line(img, (int(past_x), int(past_y)), (x, y), color=color, thickness=thickness)
+                    cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
                     past_x = x
                     past_y = y
 
@@ -195,10 +196,11 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                 cv2.circle(copied_image, (past_x, past_y),
                            int(math.sqrt(math.pow(x - past_x, 2) + math.pow(y - past_y, 2))), color, thickness)
 
+
     if finished:
         finished = False
         copied = False
-        img = copied_image.copy()
+        img = copy.copy(copied_image)
 
     if copied:
         cv2.imshow(w_name, copied_image)
@@ -214,7 +216,7 @@ def shake_prevention(x, y,past_x, past_y, color, img):
     if past_x and past_y:
         dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
         #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
-        if dist > 50:
+        if dist > 200:
             cv2.circle(img, (x, y), radius = 0, color=color, thickness=-1)
             return True
         return False
@@ -282,7 +284,6 @@ def main():
     cv2.setMouseCallback('mask', partial(line_drawing, img, color, thickness))
     cv2.setMouseCallback('video', partial(line_drawing, img, color, thickness))
     """
-    video = copy.copy(frame)
 
     # ----------------
     # Execucoes
@@ -307,11 +308,6 @@ def main():
             cv2.line(frame_copy, (int(x) + 10, int(y) + 10), (int(x) - 10, int(y) - 10), (0, 0, 255), 5)
 
         # drawing in the canvas
-        if video_flag is True:
-            mask_drawing(window_name, video, color, thickness, x, y, shape)
-            cv2.setMouseCallback('canvas',
-                                 partial(line_drawing, w_name=window_name, img=video, shape=shape, color=color,
-                                         thickness=thickness))
         mask_drawing(window_name, img, color, thickness, x, y, shape)
         cv2.setMouseCallback('canvas',
                              partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,

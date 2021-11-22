@@ -208,7 +208,6 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
         cv2.imshow(w_name, img)
    
 
-#NOT FINISHED
 def shake_prevention(x, y,past_x, past_y, color, img):
     #print('X     ' + str(x))
     #print('PAST     ' + str(past_x))
@@ -325,8 +324,8 @@ def main():
 
         key = cv2.waitKey(1)
 
-        # if args['use_shake_prevention'] is True:
-        #    shake_prevention(x, y, color, window_name, img)
+        if args['use_shake_prevention'] is True:
+            shake_prevention(x, y,past_x, past_y, color, img)
 
         # it isnt needed
         # if key != -1:

@@ -175,9 +175,10 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
             else:
                 # if flag = 0 it's the same line
                 if not shake_prevention(x,y, past_x, past_y, color, img):
-                    cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
-                    past_x = x
-                    past_y = y
+                    if past_x and past_y:
+                        cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                        past_x = x
+                        past_y = y
 
         else:
             # it starts to be a new line again

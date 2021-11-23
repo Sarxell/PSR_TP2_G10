@@ -377,6 +377,7 @@ def main():
         masks = np.concatenate((mask, mask_size), axis=0)
         cv2.imshow('masks', masks)
 
+#it needs to draw in the img but only show the video
         if video_flag:
             video = frame.copy()
             video[(img != 255)] = img[(img != 255)]

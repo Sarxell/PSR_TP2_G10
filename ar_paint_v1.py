@@ -242,6 +242,9 @@ def main():
     # Inicializações
     # ---------------
 
+    #criação da interface user friendly
+
+
     # leitura do ficheiro json
     ranges = json.load(open(args['json']))
 
@@ -269,8 +272,8 @@ def main():
 
     # mask, gray e video só estou aqui para conseguir testar os mousecallbacks nessas janelas, são para ser removidos depois
     # cv2.imshow('gray', img)
-    cv2.imshow('mask', img)
-    cv2.imshow('video', img)
+    # cv2.imshow('mask', img)
+    # cv2.imshow('video', img)
 
     # starts red
     color = (0, 0, 255)
@@ -327,12 +330,16 @@ def main():
                                      thickness=thickness))
 
         # show video, canvas, mask
+        # cv2.imshow('video', frame)
+        # cv2.imshow('video_changed', frame_copy)
+        # videos = cv2.vconcat([frame, frame_copy])
+        videos = np.concatenate((frame, frame_copy), axis=0)
+        cv2.imshow('videos', videos)
+        masks = np.concatenate((mask, mask_size), axis=0)
+        cv2.imshow('masks', masks)
 
-        cv2.imshow('video', frame)
-        cv2.imshow('video_changed', frame_copy)
-        cv2.imshow('mask', mask)
-        cv2.imshow('mask_biggest object', mask_size)
         if video_flag:
+            video = frame.copy()
             video[(img != 255)] = img[(img != 255)]
             cv2.imshow(window_name, video)
 

@@ -54,7 +54,7 @@ def interface():
     print(Style.BRIGHT + 'To see this panel again use: ' + Style.RESET_ALL + Back.YELLOW + Fore.BLACK + 'h' +
           Style.RESET_ALL)
 
-
+#Function to return distance between two points
 def distance(current_location, previous_location):
     return int(math.sqrt(math.pow(current_location[0] - previous_location[0], 2) + math.pow(current_location[1] - previous_location[1], 2)))
 

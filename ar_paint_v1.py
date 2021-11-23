@@ -31,6 +31,29 @@ class Shape(Enum):
     ELLIPSE = 3
     LINE = 4
 
+def interface():
+    print(Style.BRIGHT + 'Function of every key:')
+    print(Style.BRIGHT + 'Colors:')
+    print(Style.BRIGHT + Fore.RED + 'Red: ' + Style.RESET_ALL + 'r')
+    print(Style.BRIGHT + Fore.BLUE + 'Blue: ' + Style.RESET_ALL + 'b')
+    print(Style.BRIGHT + Fore.GREEN + 'Green: ' + Style.RESET_ALL + 'g\n')
+    print(Style.BRIGHT + 'Thickness:')
+    print(Style.BRIGHT + 'More thickness: ' + Style.RESET_ALL + '+')
+    print(Style.BRIGHT + 'Less thickness: ' + Style.RESET_ALL + '-\n')
+    print(Style.BRIGHT + 'Shapes:')
+    print(Style.BRIGHT + 'Squares: ' + Style.RESET_ALL + 's')
+    print(Style.BRIGHT + 'Circles: ' + Style.RESET_ALL + 'f')
+    print(Style.BRIGHT + 'Ellipses: ' + Style.RESET_ALL + 'e\n')
+    print(Style.BRIGHT + 'Draw in a captured picture: ' + Style.RESET_ALL + 'p')
+    print(Style.BRIGHT + 'Draw in the video: ' + Style.RESET_ALL + 'm')
+    print(Style.BRIGHT + 'Color paint test: ' + Style.RESET_ALL + 't')
+    print(Style.BRIGHT + 'See accuracy of the test: ' + Style.RESET_ALL + 'v\n')
+    print(Style.BRIGHT + 'Save the image: ' + Style.RESET_ALL + 'w')
+    print(Style.BRIGHT + 'To clear the canvas: ' + Style.RESET_ALL + 'c')
+    print(Style.BRIGHT + 'To quit: ' + Style.RESET_ALL + 'q')
+    print(Style.BRIGHT + 'To see this panel again use: ' + Style.RESET_ALL + Back.YELLOW + Fore.BLACK + 'h' +
+          Style.RESET_ALL)
+
 
 def accuracy(img_bw, img_color):
     ## convert to hsv both our drawing and the painted one
@@ -44,9 +67,17 @@ def accuracy(img_bw, img_color):
     r_color = cv2.inRange(hsv_color, (159, 50, 70), (180, 255, 255))
 
     # we also need to remove the small components from the painted mask
-    g_color, _, _ = removeSmallComponents(g_color, threshold=20)
-    b_color, _, _ = removeSmallComponents(b_color, threshold=20)
-    r_color, _, _ = removeSmallComponents(r_color, threshold=20)
+    g_color, _, _ = removeSmallComponents(g_color, threshold=50)
+    b_color, _, _ = removeSmallComponents(b_color, threshold=50)
+    r_color, _, _ = removeSmallComponents(r_color, threshold=50)
+    kernel = np.ones((5, 5), np.uint8)
+
+    r_color = cv2.dilate(r_color, kernel, 1)
+    r_color = cv2.erode(r_color, kernel, 1)
+    b_color = cv2.dilate(b_color, kernel, 1)
+    b_color = cv2.erode(b_color, kernel, 1)
+    g_color = cv2.dilate(g_color, kernel, 1)
+    g_color = cv2.erode(g_color, kernel, 1)
 
     # the masks of every color
     # the part painted that is right
@@ -54,22 +85,29 @@ def accuracy(img_bw, img_color):
     bitwiseAnd_r = cv2.bitwise_and(r_color, r)
     bitwiseAnd_b = cv2.bitwise_and(b_color, b)
     # ALL THE Paint
-    bitwiseOr_g = cv2.bitwise_or(g_color, g)
-    bitwiseOr_r = cv2.bitwise_or(r_color, r)
-    bitwiseOr_b = cv2.bitwise_or(b_color, b)
+    bitwiseor_g = cv2.bitwise_or(g_color, g)
+    bitwiseor_r = cv2.bitwise_or(r, r_color)
+    bitwiseor_b = cv2.bitwise_or(b, b_color)
 
     # calculus
+    bitwiseor_g[bitwiseor_g > 0] = 1
+    bitwiseAnd_g[bitwiseAnd_g > 0] = 1
     green_painted = sum(sum(bitwiseAnd_g))
-    total_green = sum(sum(bitwiseOr_g))
-    acc_green = green_painted / total_green * 100
+    total_green = sum(sum(bitwiseor_g))
 
+    acc_green = (green_painted / total_green) * 100
+
+    bitwiseor_b[bitwiseor_b > 0] = 1
+    bitwiseAnd_b[bitwiseAnd_b > 0] = 1
     blue_painted = sum(sum(bitwiseAnd_b))
-    total_blue = sum(sum(bitwiseOr_b))
-    acc_blue = blue_painted / total_blue * 100
+    total_blue = sum(sum(bitwiseor_b))
+    acc_blue = (blue_painted / total_blue) * 100
 
+    bitwiseor_r[bitwiseor_r > 0] = 1
+    bitwiseAnd_r[bitwiseAnd_r > 0] = 1
     red_painted = sum(sum(bitwiseAnd_r))
-    total_red = sum(sum(bitwiseOr_r))
-    acc_red = red_painted / total_red * 100
+    total_red = sum(sum(bitwiseor_r))
+    acc_red = (red_painted / total_red) * 100
 
     total_acc = (blue_painted + green_painted + red_painted) / (total_red + total_blue + total_green) * 100
 
@@ -242,7 +280,8 @@ def main():
     # Inicializações
     # ---------------
 
-    #criação da interface user friendly
+    #criação da prints para user friendly
+    interface()
 
 
     # leitura do ficheiro json
@@ -285,7 +324,7 @@ def main():
     shape = Shape.LINE
 
     # Juntei para evitar os erros nos testes acionados ao premir a tecla q
-    # img_color = None
+    img_color = None
 
     """
     this block is just testing purposes
@@ -413,6 +452,11 @@ def main():
         if key == ord('v'):
             if img_color is not None:
                 accuracy(img, img_color)
+
+        # see the user panel again
+        if key == ord('h'):
+            print(Style.BRIGHT + 'Hey! It is me again' + Style.RESET_ALL)
+            interface()
 
         # quit the program
         if key == ord('q'):

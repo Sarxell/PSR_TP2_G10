@@ -31,6 +31,7 @@ class Shape(Enum):
     ELLIPSE = 3
     LINE = 4
 
+
 def interface():
     print(Style.BRIGHT + 'Function of every key:')
     print(Style.BRIGHT + 'Colors:')
@@ -54,9 +55,11 @@ def interface():
     print(Style.BRIGHT + 'To see this panel again use: ' + Style.RESET_ALL + Back.YELLOW + Fore.BLACK + 'h' +
           Style.RESET_ALL)
 
-#Function to return distance between two points
+
 def distance(current_location, previous_location):
-    return int(math.sqrt(math.pow(current_location[0] - previous_location[0], 2) + math.pow(current_location[1] - previous_location[1], 2)))
+    return int(math.sqrt(
+        math.pow(current_location[0] - previous_location[0], 2) + math.pow(current_location[1] - previous_location[1],
+                                                                           2)))
 
 
 def accuracy(img_bw, img_color):
@@ -68,20 +71,18 @@ def accuracy(img_bw, img_color):
     hsv_color = cv2.cvtColor(img_color, cv2.COLOR_BGR2HSV)
     g_color = cv2.inRange(hsv_color, (36, 25, 25), (70, 255, 255))
     b_color = cv2.inRange(hsv_color, (94, 80, 2), (126, 255, 255))
-    r_color = cv2.inRange(hsv_color, (159, 50, 70), (180, 255, 255))
+    r1_color = cv2.inRange(hsv_color, (159, 50, 70), (180, 255, 255))
+    r2_color = cv2.inRange(hsv_color, (0, 50, 70), (9, 255, 255))
+    r_color = cv2.bitwise_or(r2_color, r1_color)
 
     # we also need to remove the small components from the painted mask
-    g_color, _, _ = removeSmallComponents(g_color, threshold=50)
-    b_color, _, _ = removeSmallComponents(b_color, threshold=50)
-    r_color, _, _ = removeSmallComponents(r_color, threshold=50)
     kernel = np.ones((5, 5), np.uint8)
-
-    r_color = cv2.dilate(r_color, kernel, 1)
     r_color = cv2.erode(r_color, kernel, 1)
-    b_color = cv2.dilate(b_color, kernel, 1)
+    r_color = cv2.dilate(r_color, kernel, 1)
     b_color = cv2.erode(b_color, kernel, 1)
-    g_color = cv2.dilate(g_color, kernel, 1)
+    b_color = cv2.dilate(b_color, kernel, 1)
     g_color = cv2.erode(g_color, kernel, 1)
+    g_color = cv2.dilate(g_color, kernel, 1)
 
     # the masks of every color
     # the part painted that is right
@@ -164,7 +165,7 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
                 if not copied:
                     copied_image = img.copy()
                     copied = True
-                cv2.circle(copied_image, (pt1_x, pt1_y),distance((x, y), (pt1_x, pt1_y)), color, thickness)
+                cv2.circle(copied_image, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
             if shape is Shape.LINE:
                 cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
                 pt1_x, pt1_y = x, y
@@ -194,7 +195,8 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
         holding = False
         finished = True
 
-#mouse callback function
+
+# mouse callback function
 def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, color, thickness):
     global pt1_x, pt1_y, drawing, copied, copied_image
     global holding, finished
@@ -211,7 +213,7 @@ def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, colo
             if shape is Shape.RECTANGLE:
                 cv2.rectangle(img, (pt1_x, pt1_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
-                cv2.circle(copied_image, (pt1_x, pt1_y),distance((x, y), (pt1_x, pt1_y)), color, thickness)
+                cv2.circle(copied_image, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
             if shape is Shape.LINE:
                 cv2.line(mask, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
                 pt1_x, pt1_y = x, y
@@ -258,12 +260,12 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                 flag = 0
             else:
                 # if flag = 0 it's the same line
-                if not shake_prevention(x,y, past_x, past_y, color, img):
+                if not shake_prevention(x, y, past_x, past_y, color, img):
                     if past_x and past_y:
                         cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
                         past_x = x
                         past_y = y
-            
+
 
         else:
             # it starts to be a new line again
@@ -278,10 +280,9 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                 copied = True
                 copied_image = img.copy()
             if shape is Shape.RECTANGLE:
-                    cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
+                cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
                 cv2.circle(copied_image, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
-                
 
     if finished:
         finished = False
@@ -295,14 +296,14 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
         cv2.imshow(w_name, copied_image)
     else:
         cv2.imshow(w_name, img)
-   
+
 
 def shake_prevention(x, y, past_x, past_y, color, img):
     # print('X     ' + str(x))
     # print('PAST     ' + str(past_x))
     # Distancia ponto atual ao ponto anterior
-    #if past_x and past_y and x and y:
-        #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
+    if past_x and past_y and x and y:
+    # Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
         if distance((x, y), (past_x, past_y)) > 100:
             return True
         return False
@@ -322,9 +323,8 @@ def main():
     # Inicializações
     # ---------------
 
-    #criação da prints para user friendly
+    # criação da prints para user friendly
     interface()
-
 
     # leitura do ficheiro json
     ranges = json.load(open(args['json']))
@@ -401,12 +401,14 @@ def main():
         # drawing in the canvas
         if video_flag:
             mask_drawing(window_name, video, color, thickness, x, y, shape)
-            cv2.setMouseCallback('canvas',partial(line_drawing_video, w_name=window_name, img=video, mask=img,shape=shape, color=color,thickness=thickness))
+            cv2.setMouseCallback('canvas',
+                                 partial(line_drawing_video, w_name=window_name, img=video, mask=img, shape=shape,
+                                         color=color, thickness=thickness))
         else:
             mask_drawing(window_name, img, color, thickness, x, y, shape)
             cv2.setMouseCallback('canvas',
-                                partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,
-                                        thickness=thickness))
+                                 partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,
+                                         thickness=thickness))
 
         # show video, canvas, mask
         # cv2.imshow('video', frame)
@@ -417,7 +419,7 @@ def main():
         masks = np.concatenate((mask, mask_size), axis=0)
         cv2.imshow('masks', masks)
 
-#it needs to draw in the img but only show the video
+        # it needs to draw in the img but only show the video
         if video_flag:
             video = frame.copy()
             video[(img != 255)] = img[(img != 255)]

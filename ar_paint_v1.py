@@ -55,6 +55,10 @@ def interface():
           Style.RESET_ALL)
 
 
+def distance(current_location, previous_location):
+    return int(math.sqrt(math.pow(current_location[0] - previous_location[0], 2) + math.pow(current_location[1] - previous_location[1], 2)))
+
+
 def accuracy(img_bw, img_color):
     ## convert to hsv both our drawing and the painted one
     hsv_bw = cv2.cvtColor(img_bw, cv2.COLOR_BGR2HSV)
@@ -160,8 +164,7 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
                 if not copied:
                     copied_image = img.copy()
                     copied = True
-                cv2.circle(copied_image, (pt1_x, pt1_y),
-                           int(math.sqrt(math.pow(x - pt1_x, 2) + math.pow(y - pt1_y, 2))), color, thickness)
+                cv2.circle(copied_image, (pt1_x, pt1_y),distance((x, y), (pt1_x, pt1_y)), color, thickness)
             if shape is Shape.LINE:
                 cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
                 pt1_x, pt1_y = x, y
@@ -179,8 +182,7 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
         if shape is Shape.RECTANGLE:
             cv2.rectangle(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
         if shape is Shape.CIRCLE:
-            cv2.circle(img, (pt1_x, pt1_y), int(math.sqrt(math.pow(x - pt1_x, 2) + math.pow(y - pt1_y, 2))), color,
-                       thickness)
+            cv2.circle(img, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
 
         cv2.imshow(w_name, img)
 
@@ -217,6 +219,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                         cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
                         past_x = x
                         past_y = y
+            
 
         else:
             # it starts to be a new line again
@@ -233,8 +236,8 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
             if shape is Shape.RECTANGLE:
                 cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
-                cv2.circle(copied_image, (past_x, past_y),
-                           int(math.sqrt(math.pow(x - past_x, 2) + math.pow(y - past_y, 2))), color, thickness)
+                cv2.circle(copied_image, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+                
 
     if finished:
         finished = False
@@ -242,8 +245,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
         if shape is Shape.RECTANGLE:
             cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
         if shape is Shape.CIRCLE:
-            cv2.circle(img, (past_x, past_y),
-                       int(math.sqrt(math.pow(x - past_x, 2) + math.pow(y - past_y, 2))), color, thickness)
+            cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
 
     if copied:
         cv2.imshow(w_name, copied_image)
@@ -255,13 +257,9 @@ def shake_prevention(x, y, past_x, past_y, color, img):
     # print('X     ' + str(x))
     # print('PAST     ' + str(past_x))
     # Distancia ponto atual ao ponto anterior
-    if past_x and past_y and x and y:
-        dist=int(math.sqrt(math.pow(x-past_x,2)+math.pow(y-past_y,2)))
+    #if past_x and past_y and x and y:
         #Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
-        if dist > 500:
-            x = int(np.float32(x))
-            y = int(np.float32(y))
-            cv2.circle(img, (x, y), radius = 0, color=color, thickness=-1)
+        if distance((x, y), (past_x, past_y)) > 100:
             return True
         return False
 

@@ -194,6 +194,50 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
         holding = False
         finished = True
 
+#mouse callback function
+def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, color, thickness):
+    global pt1_x, pt1_y, drawing, copied, copied_image
+    global holding, finished
+    # user presses the left button
+    if event == cv2.EVENT_LBUTTONDOWN:
+        drawing = True
+        pt1_x, pt1_y = x, y
+
+    # starts drawing
+    elif event == cv2.EVENT_MOUSEMOVE:
+        if drawing:
+            # after the rectangle, he disappears if the button wasnt pressed
+            copied_image = mask.copy()
+            if shape is Shape.RECTANGLE:
+                cv2.rectangle(img, (pt1_x, pt1_y), (x, y), color, thickness)
+            if shape is Shape.CIRCLE:
+                cv2.circle(copied_image, (pt1_x, pt1_y),distance((x, y), (pt1_x, pt1_y)), color, thickness)
+            if shape is Shape.LINE:
+                cv2.line(mask, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
+                pt1_x, pt1_y = x, y
+            else:
+                cv2.imshow(w_name, img)
+
+    # stops drawing
+    elif event == cv2.EVENT_LBUTTONUP:
+        drawing, copied = False, False
+        if shape is Shape.LINE:
+            cv2.line(mask, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
+        if shape is Shape.RECTANGLE:
+            cv2.rectangle(mask, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
+        if shape is Shape.CIRCLE:
+            cv2.circle(mask, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
+
+        cv2.imshow(w_name, img)
+
+    if event == cv2.EVENT_MBUTTONDOWN:
+        holding = True
+        finished = False
+
+    if event == cv2.EVENT_MBUTTONUP:
+        holding = False
+        finished = True
+
 
 # mouse callback function
 def mask_drawing(w_name, img, color, thickness, x, y, shape):
@@ -234,7 +278,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                 copied = True
                 copied_image = img.copy()
             if shape is Shape.RECTANGLE:
-                cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
+                    cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
                 cv2.circle(copied_image, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
                 
@@ -357,14 +401,12 @@ def main():
         # drawing in the canvas
         if video_flag:
             mask_drawing(window_name, video, color, thickness, x, y, shape)
-            video = cv2.setMouseCallback('canvas',
-                                 partial(line_drawing, w_name=window_name, img=video, shape=shape, color=color,
-                                         thickness=thickness))
-
-        mask_drawing(window_name, img, color, thickness, x, y, shape)
-        cv2.setMouseCallback('canvas',
-                             partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,
-                                     thickness=thickness))
+            cv2.setMouseCallback('canvas',partial(line_drawing_video, w_name=window_name, img=video, mask=img,shape=shape, color=color,thickness=thickness))
+        else:
+            mask_drawing(window_name, img, color, thickness, x, y, shape)
+            cv2.setMouseCallback('canvas',
+                                partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,
+                                        thickness=thickness))
 
         # show video, canvas, mask
         # cv2.imshow('video', frame)

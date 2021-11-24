@@ -309,10 +309,8 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
             if shape is Shape.ELLIPSE:
                 cv2.ellipse(copied_image, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
                             angle(past_x, x, past_y, y), 0., 360, color, thickness)
-            if shape is Shape.LINE:
-                cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
-                past_x = x
-                past_y = y
+            else:
+                cv2.imshow(w_name, copied_image)
 
     if finished:
         copied = False
@@ -328,6 +326,81 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
         cv2.imshow(w_name, copied_image)
     else:
         cv2.imshow(w_name, img)
+
+# mouse callback function
+def mask_drawing_video(w_name, img,mask, color, thickness, x, y, shape, flag_shake):
+    # flag to see if is a new line or not
+    global flag, holding, finished
+    global copied, copied_image
+    global past_x, past_y
+
+    if not holding:
+        if x:
+            x = int(x)
+            y = int(y)
+            # it means there is a new line
+            if shape is Shape.LINE:
+                if flag == 1:
+                    cv2.line(mask, (x, y), (x, y), color=color, thickness=thickness)
+                    past_x = x
+                    past_y = y
+                    flag = 0
+                else:
+                    # if flag = 0 it's the same line
+                    if flag_shake is True:
+                        if not shake_prevention(x, y, past_x, past_y, color, img):
+                            if past_x and past_y:
+                                cv2.line(mask, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                                past_x = x
+                                past_y = y
+                    else:
+                        if past_x and past_y:
+                            cv2.line(mask, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                            past_x = x
+                            past_y = y
+            else:
+                past_x = x
+                past_y = y
+        else:
+            # it starts to be a new line again
+            flag = 1
+
+    else:
+        if x:
+            x = int(x)
+            y = int(y)
+            if not finished:
+                copied = True
+                copied_image = mask.copy()
+            if shape is Shape.RECTANGLE:
+                cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
+            if shape is Shape.CIRCLE:
+                cv2.circle(copied_image, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+            if shape is Shape.ELLIPSE:
+                cv2.ellipse(copied_image, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
+                            angle(past_x, x, past_y, y), 0., 360, color, thickness)
+            if shape is Shape.LINE:
+                cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                past_x = x
+                past_y = y
+
+    if finished:
+        copied = False
+        if x:
+            if shape is Shape.RECTANGLE:
+                cv2.rectangle(mask, (past_x, past_y), (x, y), color, thickness)
+            if shape is Shape.CIRCLE:
+                cv2.circle(mask, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+            if shape is Shape.ELLIPSE:
+                cv2.ellipse(mask, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)), angle(past_x, x, past_y, y),
+                            0., 360, color, thickness)
+
+        """
+    if copied:
+        cv2.imshow(w_name, copied_image)
+    else:
+        cv2.imshow(w_name, img)
+    """
 
 
 def shake_prevention(x, y, past_x, past_y, color, img):
@@ -432,7 +505,7 @@ def main():
 
         # drawing in the canvas
         if video_flag:
-            mask_drawing(window_name, video, color, thickness, x, y, shape, args['use_shake_prevention'])
+            mask_drawing_video(window_name, video, img, color, thickness, x, y, shape, args['use_shake_prevention'])
             cv2.setMouseCallback('canvas',
                                  partial(line_drawing_video, w_name=window_name, img=video, mask=img, shape=shape,
                                          color=color, thickness=thickness))

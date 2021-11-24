@@ -121,9 +121,10 @@ def main():
         # it needs to draw in the img but only show the video
         if video_flag:
             video = frame.copy()
-            cv2.resize(img, [w, h])
-            video[(img != 255)] = img[(img != 255)]
-            cv2.imshow(window_name, video)
+            (h_i, w_i) = img.shape[:2]
+            if h_i == h:
+                video[(img != 255)] = img[(img != 255)]
+                cv2.imshow(window_name, video)
 
         key = cv2.waitKey(1)
 
@@ -143,6 +144,7 @@ def main():
 
         # clear the board
         if key == ord('c'):
+            img = cv2.resize(img, [w, h])
             img.fill(255)
             cv2.imshow(window_name, img)
 

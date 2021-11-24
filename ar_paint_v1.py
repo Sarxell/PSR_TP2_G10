@@ -253,8 +253,8 @@ def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, colo
         finished = False
 
     if event == cv2.EVENT_MBUTTONUP:
-        holding = False
         finished = True
+        holding = False
 
 
 # mouse callback function
@@ -299,7 +299,6 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
         if x:
             x = int(x)
             y = int(y)
-            copied_image = img.copy()
             if not finished:
                 copied = True
                 copied_image = img.copy()
@@ -316,7 +315,6 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
                 past_y = y
 
     if finished:
-        finished = False
         copied = False
         if shape is Shape.RECTANGLE:
             cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)

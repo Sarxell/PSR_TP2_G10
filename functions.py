@@ -32,6 +32,8 @@ def interface():
     print(Style.BRIGHT + 'Thickness:')
     print(Style.BRIGHT + 'More thickness: ' + Style.RESET_ALL + '+')
     print(Style.BRIGHT + 'Less thickness: ' + Style.RESET_ALL + '-\n')
+    print(Style.BRIGHT + 'Drawn with the mask: ' + Style.RESET_ALL + 'middle button hold')
+    print(Style.BRIGHT + 'Drawn with the mouse: ' + Style.RESET_ALL + 'left button hold\n')
     print(Style.BRIGHT + 'Shapes:')
     print(Style.BRIGHT + 'Squares: ' + Style.RESET_ALL + 's')
     print(Style.BRIGHT + 'Circles: ' + Style.RESET_ALL + 'f')

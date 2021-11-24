@@ -303,6 +303,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
                 past_y = y
 
     if finished is True:
+        finished = False
         copied = False
         holding = False
         if shape is Shape.RECTANGLE:
@@ -380,6 +381,7 @@ def mask_drawing_video(w_name, img, mask, color, thickness, x, y, shape, flag_sh
 
     if finished:
         finished = False
+        holding = False
         copied = False
         if x:
             if shape is Shape.RECTANGLE:

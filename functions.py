@@ -306,15 +306,14 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
         finished = False
         copied = False
         holding = False
-        if shape is Shape.RECTANGLE:
-            cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
-        if shape is Shape.CIRCLE:
-            cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
-        if shape is Shape.ELLIPSE:
-            cv2.ellipse(img, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
-                        angle(past_x, x, past_y, y), 0., 360, color, thickness)
-        else:
-            cv2.imshow(w_name, copied_image)
+        if x and past_x:
+            if shape is Shape.RECTANGLE:
+                cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
+            if shape is Shape.CIRCLE:
+                cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+            if shape is Shape.ELLIPSE:
+                cv2.ellipse(img, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
+                            angle(past_x, x, past_y, y), 0., 360, color, thickness)
 
     if copied is True:
         cv2.imshow(w_name, copied_image)
@@ -383,15 +382,14 @@ def mask_drawing_video(w_name, img, mask, color, thickness, x, y, shape, flag_sh
         finished = False
         holding = False
         copied = False
-        if x:
+        if x and past_x:
             if shape is Shape.RECTANGLE:
-                cv2.rectangle(mask, (past_x, past_y), (x, y), color, thickness)
+                cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
-                cv2.circle(mask, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+                cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
             if shape is Shape.ELLIPSE:
-                cv2.ellipse(mask, (past_x, past_y), (abs(x - past_x), abs(y - past_y)),
-                            angle(past_x, x, past_y, y),
-                            0., 360, color, thickness)
+                cv2.ellipse(img, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
+                            angle(past_x, x, past_y, y), 0., 360, color, thickness)
 
         """
     if copied:

@@ -174,11 +174,6 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
             else:
                 cv2.imshow(w_name, copied_image)
 
-            # if copied:
-            #     cv2.imshow(w_name, copied_image)
-            # else:
-            #     cv2.imshow(w_name, img)
-
     # stops drawing
     elif event == cv2.EVENT_LBUTTONUP:
         drawing, copied = False, False
@@ -293,9 +288,10 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
         if x:
             x = int(x)
             y = int(y)
+            copied_image = img.copy()
             if not finished:
-                copied = True
                 copied_image = img.copy()
+                copied = True
             if shape is Shape.RECTANGLE:
                 cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
@@ -303,19 +299,23 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
             if shape is Shape.ELLIPSE:
                 cv2.ellipse(copied_image, (past_x, past_y), (abs(x - past_x), abs(y - past_y)),
                             angle(past_x, x, past_y, y), 0., 360, color, thickness)
+            if shape is Shape.LINE:
+                cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                past_x = x
+                past_y = y
             else:
                 cv2.imshow(w_name, copied_image)
 
-    if finished:
-        finished = False
-        copied = False
-        if shape is Shape.RECTANGLE:
-            cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
-        if shape is Shape.CIRCLE:
-            cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
-        if shape is Shape.ELLIPSE:
-            cv2.ellipse(img, (past_x, past_y), (abs(x - past_x), abs(y - past_y)), angle(past_x, x, past_y, y),
-                        0., 360, color, thickness)
+        if finished:
+            copied = False
+            if shape is Shape.RECTANGLE:
+                cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
+            if shape is Shape.CIRCLE:
+                cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+            if shape is Shape.ELLIPSE:
+                cv2.ellipse(img, (past_x, past_y), (abs(x - past_x), abs(y - past_y)), angle(past_x, x, past_y, y),
+                            0., 360, color, thickness)
+            copied_image = img.copy()
 
     if copied:
         cv2.imshow(w_name, copied_image)

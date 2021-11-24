@@ -112,6 +112,7 @@ def main():
         # cv2.imshow('video', frame)
         # cv2.imshow('video_changed', frame_copy)
         # videos = cv2.vconcat([frame, frame_copy])
+        # cv2.imshow(window_name, img)
         videos = np.concatenate((frame, frame_copy), axis=0)
         cv2.imshow('videos', videos)
         masks = np.concatenate((mask, mask_size), axis=0)

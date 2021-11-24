@@ -193,7 +193,6 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
         finished = False
 
     if event == cv2.EVENT_MBUTTONUP:
-        holding = False
         finished = True
 
 
@@ -243,7 +242,6 @@ def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, colo
 
     if event == cv2.EVENT_MBUTTONUP:
         finished = True
-        holding = False
 
 
 # mouse callback function
@@ -253,12 +251,12 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
     global copied, copied_image
     global past_x, past_y
 
-    if not holding:
+    if holding is False:
         if x:
             x = int(x)
             y = int(y)
-            # it means there is a new line
             if shape is Shape.LINE:
+                # it starts a new line
                 if flag == 1:
                     cv2.line(img, (x, y), (x, y), color=color, thickness=thickness)
                     past_x = x
@@ -281,43 +279,43 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
                 past_x = x
                 past_y = y
         else:
-            # it starts to be a new line again
             flag = 1
 
-    else:
+    if holding is True:
         if x:
             x = int(x)
             y = int(y)
-            copied_image = img.copy()
-            if not finished:
-                copied_image = img.copy()
+            if finished is False:
                 copied = True
+                copied_image = img.copy()
             if shape is Shape.RECTANGLE:
                 cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
+            else:
+                cv2.imshow(w_name, copied_image)
             if shape is Shape.CIRCLE:
                 cv2.circle(copied_image, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
             if shape is Shape.ELLIPSE:
-                cv2.ellipse(copied_image, (past_x, past_y), (abs(x - past_x), abs(y - past_y)),
+                cv2.ellipse(copied_image, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
                             angle(past_x, x, past_y, y), 0., 360, color, thickness)
             if shape is Shape.LINE:
                 cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
                 past_x = x
                 past_y = y
-            else:
-                cv2.imshow(w_name, copied_image)
 
-        if finished:
-            copied = False
-            if shape is Shape.RECTANGLE:
-                cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
-            if shape is Shape.CIRCLE:
-                cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
-            if shape is Shape.ELLIPSE:
-                cv2.ellipse(img, (past_x, past_y), (abs(x - past_x), abs(y - past_y)), angle(past_x, x, past_y, y),
-                            0., 360, color, thickness)
-            copied_image = img.copy()
+    if finished is True:
+        copied = False
+        holding = False
+        if shape is Shape.RECTANGLE:
+            cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
+        if shape is Shape.CIRCLE:
+            cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+        if shape is Shape.ELLIPSE:
+            cv2.ellipse(img, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
+                        angle(past_x, x, past_y, y), 0., 360, color, thickness)
+        else:
+            cv2.imshow(w_name, copied_image)
 
-    if copied:
+    if copied is True:
         cv2.imshow(w_name, copied_image)
     else:
         cv2.imshow(w_name, img)

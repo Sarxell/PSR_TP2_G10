@@ -58,6 +58,7 @@ def angle(x1, x2, y1, y2):
 
 
 def accuracy(img_bw, img_color):
+
     ## convert to hsv both our drawing and the painted one
     hsv_bw = cv2.cvtColor(img_bw, cv2.COLOR_BGR2HSV)
     g = cv2.inRange(hsv_bw, (36, 25, 25), (70, 255, 255))
@@ -290,8 +291,6 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
                 copied_image = img.copy()
             if shape is Shape.RECTANGLE:
                 cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
-            else:
-                cv2.imshow(w_name, copied_image)
             if shape is Shape.CIRCLE:
                 cv2.circle(copied_image, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
             if shape is Shape.ELLIPSE:
@@ -301,6 +300,8 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
                 cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
                 past_x = x
                 past_y = y
+            else:
+                cv2.imshow(w_name, copied_image)
 
     if finished is True:
         finished = False
@@ -374,7 +375,7 @@ def mask_drawing_video(w_name, img, mask, color, thickness, x, y, shape, flag_sh
                 cv2.ellipse(copied_image, (past_x, past_y), (abs(x - past_x), abs(y - past_y)),
                             angle(past_x, x, past_y, y), 0., 360, color, thickness)
             if shape is Shape.LINE:
-                cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                cv2.line(mask, (past_x, past_y), (x, y), color=color, thickness=thickness)
                 past_x = x
                 past_y = y
 
@@ -384,19 +385,12 @@ def mask_drawing_video(w_name, img, mask, color, thickness, x, y, shape, flag_sh
         copied = False
         if x and past_x:
             if shape is Shape.RECTANGLE:
-                cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
+                cv2.rectangle(mask, (past_x, past_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
-                cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+                cv2.circle(mask, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
             if shape is Shape.ELLIPSE:
-                cv2.ellipse(img, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
+                cv2.ellipse(mask, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
                             angle(past_x, x, past_y, y), 0., 360, color, thickness)
-
-        """
-    if copied:
-        cv2.imshow(w_name, copied_image)
-    else:
-        cv2.imshow(w_name, img)
-    """
 
 
 def shake_prevention(x, y, past_x, past_y, color, img):

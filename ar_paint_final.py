@@ -121,6 +121,7 @@ def main():
         # it needs to draw in the img but only show the video
         if video_flag:
             video = frame.copy()
+            cv2.resize(img, [w, h])
             video[(img != 255)] = img[(img != 255)]
             cv2.imshow(window_name, video)
 

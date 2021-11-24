@@ -17,7 +17,6 @@ drawing = False  # true if mouse is pressed
 pt1_x, pt1_y = None, None
 copied = False
 copied_image = None
-copied_image_2 = None
 flag = 0
 past_x, past_y = None, None
 holding = False
@@ -60,6 +59,10 @@ def distance(current_location, previous_location):
     return int(math.sqrt(
         math.pow(current_location[0] - previous_location[0], 2) + math.pow(current_location[1] - previous_location[1],
                                                                            2)))
+
+
+def angle(x1, x2, y1, y2):
+    return math.degrees(math.atan2(y2 - y1, x2 - x1))
 
 
 def accuracy(img_bw, img_color):
@@ -166,14 +169,22 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
                     copied_image = img.copy()
                     copied = True
                 cv2.circle(copied_image, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
+            if shape is Shape.ELLIPSE:
+                if not copied:
+                    copied_image = img.copy()
+                    copied = True
+                cv2.ellipse(copied_image, (pt1_x, pt1_y), (abs(x + 1 - pt1_x), abs(y + 1 - pt1_y)), angle(pt1_x, x, pt1_y, y),
+                            0., 360, color, thickness)
             if shape is Shape.LINE:
                 cv2.line(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
                 pt1_x, pt1_y = x, y
-
-            if copied:
-                cv2.imshow(w_name, copied_image)
             else:
-                cv2.imshow(w_name, img)
+                cv2.imshow(w_name, copied_image)
+
+            # if copied:
+            #     cv2.imshow(w_name, copied_image)
+            # else:
+            #     cv2.imshow(w_name, img)
 
     # stops drawing
     elif event == cv2.EVENT_LBUTTONUP:
@@ -184,8 +195,9 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
             cv2.rectangle(img, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
         if shape is Shape.CIRCLE:
             cv2.circle(img, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
-
-        cv2.imshow(w_name, img)
+        if shape is Shape.ELLIPSE:
+            cv2.ellipse(img, (pt1_x, pt1_y), (abs(x + 1 - pt1_x), abs(y + 1 - pt1_y)), angle(pt1_x, x, pt1_y, y), 0., 360, color,
+                        thickness)
 
     if event == cv2.EVENT_MBUTTONDOWN:
         holding = True
@@ -198,7 +210,7 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
 
 # mouse callback function
 def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, color, thickness):
-    global pt1_x, pt1_y, drawing, copied, copied_image
+    global pt1_x, pt1_y, drawing, copied_image
     global holding, finished
     # user presses the left button
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -208,29 +220,33 @@ def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, colo
     # starts drawing
     elif event == cv2.EVENT_MOUSEMOVE:
         if drawing:
-            # after the rectangle, he disappears if the button wasnt pressed
-            copied_image = mask.copy()
+            # after the form, he disappears if the button wasnt pressed
+            copied_image = img.copy()
             if shape is Shape.RECTANGLE:
-                cv2.rectangle(img, (pt1_x, pt1_y), (x, y), color, thickness)
+                cv2.rectangle(copied_image, (pt1_x, pt1_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
                 cv2.circle(copied_image, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
+            if shape is Shape.ELLIPSE:
+                cv2.ellipse(copied_image, (pt1_x, pt1_y), (abs(x + 1 - pt1_x), abs(y + 1 - pt1_y)), angle(pt1_x, x,
+                            pt1_y, y), 0., 360, color, thickness)
             if shape is Shape.LINE:
                 cv2.line(mask, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
                 pt1_x, pt1_y = x, y
             else:
-                cv2.imshow(w_name, img)
+                cv2.imshow(w_name, copied_image)
 
     # stops drawing
     elif event == cv2.EVENT_LBUTTONUP:
-        drawing, copied = False, False
+        drawing = False
         if shape is Shape.LINE:
             cv2.line(mask, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
         if shape is Shape.RECTANGLE:
             cv2.rectangle(mask, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
         if shape is Shape.CIRCLE:
             cv2.circle(mask, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
-
-        cv2.imshow(w_name, img)
+        if shape is Shape.ELLIPSE:
+            cv2.ellipse(mask, (pt1_x, pt1_y), (abs(x + 1 - pt1_x), abs(y + 1 - pt1_y)), angle(pt1_x, x, pt1_y, y),
+                        0., 360, color, thickness)
 
     if event == cv2.EVENT_MBUTTONDOWN:
         holding = True
@@ -242,7 +258,7 @@ def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, colo
 
 
 # mouse callback function
-def mask_drawing(w_name, img, color, thickness, x, y, shape):
+def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
     # flag to see if is a new line or not
     global flag, holding, finished
     global copied, copied_image
@@ -260,7 +276,13 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                 flag = 0
             else:
                 # if flag = 0 it's the same line
-                if not shake_prevention(x, y, past_x, past_y, color, img):
+                if flag_shake is True:
+                    if not shake_prevention(x, y, past_x, past_y, color, img):
+                        if past_x and past_y:
+                            cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                            past_x = x
+                            past_y = y
+                else:
                     if past_x and past_y:
                         cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
                         past_x = x
@@ -283,6 +305,10 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
                 cv2.rectangle(copied_image, (past_x, past_y), (x, y), color, thickness)
             if shape is Shape.CIRCLE:
                 cv2.circle(copied_image, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+            if shape is Shape.ELLIPSE:
+                cv2.ellipse(copied_image, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
+                            angle(past_x, x, past_y, y), 0., 360, color, thickness)
+
 
     if finished:
         finished = False
@@ -291,6 +317,9 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape):
             cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
         if shape is Shape.CIRCLE:
             cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
+        if shape is Shape.ELLIPSE:
+            cv2.ellipse(img, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)), angle(past_x, x, past_y, y),
+                        0., 360, color, thickness)
 
     if copied:
         cv2.imshow(w_name, copied_image)
@@ -400,12 +429,12 @@ def main():
 
         # drawing in the canvas
         if video_flag:
-            mask_drawing(window_name, video, color, thickness, x, y, shape)
+            mask_drawing(window_name, video, color, thickness, x, y, shape, args['use_shake_prevention'])
             cv2.setMouseCallback('canvas',
                                  partial(line_drawing_video, w_name=window_name, img=video, mask=img, shape=shape,
                                          color=color, thickness=thickness))
         else:
-            mask_drawing(window_name, img, color, thickness, x, y, shape)
+            mask_drawing(window_name, img, color, thickness, x, y, shape, args['use_shake_prevention'])
             cv2.setMouseCallback('canvas',
                                  partial(line_drawing, w_name=window_name, img=img, shape=shape, color=color,
                                          thickness=thickness))

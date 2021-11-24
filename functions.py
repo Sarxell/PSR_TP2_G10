@@ -22,7 +22,7 @@ class Shape(Enum):
     ELLIPSE = 3
     LINE = 4
 
-
+#Recallable User guide for program usage instructions
 def interface():
     print(Style.BRIGHT + 'Function of every key:')
     print(Style.BRIGHT + 'Colors:')
@@ -49,16 +49,18 @@ def interface():
           Style.RESET_ALL)
 
 
+#Function for calculating distance between two points in a plane 
 def distance(current_location, previous_location):
     return int(math.sqrt(
         math.pow(current_location[0] - previous_location[0], 2) + math.pow(current_location[1] - previous_location[1],
                                                                            2)))
 
-
+#Used for creation of ellipses
 def angle(x1, x2, y1, y2):
     return math.degrees(math.atan2(y2 - y1, x2 - x1))
 
 
+#Calculates how well a user did in a test by comparing user's performance with the original colored image
 def accuracy(img_bw, img_color):
 
     ## convert to hsv both our drawing and the painted one
@@ -119,7 +121,7 @@ def accuracy(img_bw, img_color):
     print('Your red accuracy was ' + str(acc_red))
     print('Your total accuracy was ' + str(total_acc))
 
-
+#Fuzzy detections that result in little blobs are cleared leaving only bigger objects detected
 def removeSmallComponents(image, threshold):
     # find all your connected components (white blobs in your image)
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=8)
@@ -140,7 +142,7 @@ def removeSmallComponents(image, threshold):
     return img2, x, y
 
 
-# mouse callback function
+# mouse callback function for drawing on canvas with mouse
 def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness):
     global pt1_x, pt1_y, drawing, copied, copied_image
     global holding, finished
@@ -199,7 +201,7 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
         finished = True
 
 
-# mouse callback function
+# mouse callback function from drawing on canvs with mouse over video feed
 def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, color, thickness):
     global pt1_x, pt1_y, drawing, copied_image
     global holding, finished
@@ -247,7 +249,7 @@ def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, colo
         finished = True
 
 
-# mouse callback function
+# function for drawing on canvas with object detection
 def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
     # flag to see if is a new line or not
     global flag, holding, finished
@@ -324,7 +326,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
         cv2.imshow(w_name, img)
 
 
-# mouse callback function
+# function for drawing on canvas with object detection over video feed
 def mask_drawing_video(w_name, img, mask, color, thickness, x, y, shape, flag_shake):
     # flag to see if is a new line or not
     global flag, holding, finished
@@ -394,12 +396,10 @@ def mask_drawing_video(w_name, img, mask, color, thickness, x, y, shape, flag_sh
                 cv2.ellipse(mask, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
                             angle(past_x, x, past_y, y), 0., 360, color, thickness)
 
-
-def shake_prevention(x, y, past_x, past_y, color, img):
-    # print('X     ' + str(x))
-    # print('PAST     ' + str(past_x))
+#This function is used to combat erratic lines over canvas caused by poor object detection
+def shake_prevention(x, y, past_x, past_y):
     # Distancia ponto atual ao ponto anterior
-    if past_x and past_y and x and y:
+    if past_x and past_y:
         # Se a distancia for superior a 50 retorna que é necessário fazer shake prevention caso contrario retorna que não é necessário
         if distance((x, y), (past_x, past_y)) > 100:
             return True

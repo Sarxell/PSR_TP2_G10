@@ -3,11 +3,12 @@ import numpy as np
 import json
 import cv2
 
+#Callback handler for updating dictionary values when sliding the trackbars
 def onTrackBar(value, channel, min_max, ranges):
     ranges[channel][min_max] = value
 
+#Here we create the trackbars, the callbacks and display the image of objects within the ranges set by users
 def main():
-    
     capture = cv2.VideoCapture(0)
     window_name = 'original'
     segmented_window = 'Color Segmenter'

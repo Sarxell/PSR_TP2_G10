@@ -7,7 +7,7 @@ from imutils.video import VideoStream
 import random
 from functions import *
 
-
+#Takes in arguments for the Json used for calibration and for activating shake prevention 
 def main():
     video_flag = 0
     parser = argparse.ArgumentParser(description='OPenCV example')
@@ -144,7 +144,7 @@ def main():
 
         # clear the board
         if key == ord('c'):
-            img = cv2.resize(img, [w, h])
+            #img = cv2.resize(img, [w, h])
             img.fill(255)
             cv2.imshow(window_name, img)
 

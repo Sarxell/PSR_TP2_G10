@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module functions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>functions</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/luisfgbs/PSR_TP2_G10/functions.py">/home/luisfgbs/PSR_TP2_G10/functions.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="cv2.html">cv2</a><br>
+</td><td width="25%" valign=top><a href="math.html">math</a><br>
+</td><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="enum.html#Enum">enum.Enum</a>(<a href="builtins.html#object">builtins.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="functions.html#Shape">Shape</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Shape">class <strong>Shape</strong></a>(<a href="enum.html#Enum">enum.Enum</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Shape">Shape</a>(value,&nbsp;names=None,&nbsp;*,&nbsp;module=None,&nbsp;qualname=None,&nbsp;type=None,&nbsp;start=1)<br>
+&nbsp;<br>
+An&nbsp;enumeration.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="functions.html#Shape">Shape</a></dd>
+<dd><a href="enum.html#Enum">enum.Enum</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>CIRCLE</strong> = &lt;Shape.CIRCLE: 2&gt;</dl>
+
+<dl><dt><strong>ELLIPSE</strong> = &lt;Shape.ELLIPSE: 3&gt;</dl>
+
+<dl><dt><strong>LINE</strong> = &lt;Shape.LINE: 4&gt;</dl>
+
+<dl><dt><strong>RECTANGLE</strong> = &lt;Shape.RECTANGLE: 1&gt;</dl>
+
+<hr>
+Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><strong>name</strong></dt>
+<dd><tt>The&nbsp;name&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</tt></dd>
+</dl>
+<dl><dt><strong>value</strong></dt>
+<dd><tt>The&nbsp;value&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</tt></dd>
+</dl>
+<hr>
+Readonly properties inherited from <a href="enum.html#EnumMeta">enum.EnumMeta</a>:<br>
+<dl><dt><strong>__members__</strong></dt>
+<dd><tt>Returns&nbsp;a&nbsp;mapping&nbsp;of&nbsp;member&nbsp;name-&gt;value.<br>
+&nbsp;<br>
+This&nbsp;mapping&nbsp;lists&nbsp;all&nbsp;enum&nbsp;members,&nbsp;including&nbsp;aliases.&nbsp;Note&nbsp;that&nbsp;this<br>
+is&nbsp;a&nbsp;read-only&nbsp;view&nbsp;of&nbsp;the&nbsp;internal&nbsp;mapping.</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-accuracy"><strong>accuracy</strong></a>(img_bw, img_color)</dt><dd><tt>#Calculates&nbsp;how&nbsp;well&nbsp;a&nbsp;user&nbsp;did&nbsp;in&nbsp;a&nbsp;test&nbsp;by&nbsp;comparing&nbsp;user's&nbsp;performance&nbsp;with&nbsp;the&nbsp;original&nbsp;colored&nbsp;image</tt></dd></dl>
+ <dl><dt><a name="-angle"><strong>angle</strong></a>(x1, x2, y1, y2)</dt><dd><tt>#Used&nbsp;for&nbsp;creation&nbsp;of&nbsp;ellipses</tt></dd></dl>
+ <dl><dt><a name="-distance"><strong>distance</strong></a>(current_location, previous_location)</dt><dd><tt>#Function&nbsp;for&nbsp;calculating&nbsp;distance&nbsp;between&nbsp;two&nbsp;points&nbsp;in&nbsp;a&nbsp;plane</tt></dd></dl>
+ <dl><dt><a name="-interface"><strong>interface</strong></a>()</dt><dd><tt>#Recallable&nbsp;User&nbsp;guide&nbsp;for&nbsp;program&nbsp;usage&nbsp;instructions</tt></dd></dl>
+ <dl><dt><a name="-line_drawing"><strong>line_drawing</strong></a>(event, x, y, flags, param, w_name, img, shape, color, thickness)</dt><dd><tt>#&nbsp;mouse&nbsp;callback&nbsp;function&nbsp;for&nbsp;drawing&nbsp;on&nbsp;canvas&nbsp;with&nbsp;mouse</tt></dd></dl>
+ <dl><dt><a name="-line_drawing_video"><strong>line_drawing_video</strong></a>(event, x, y, flags, param, w_name, img, mask, shape, color, thickness)</dt><dd><tt>#&nbsp;mouse&nbsp;callback&nbsp;function&nbsp;from&nbsp;drawing&nbsp;on&nbsp;canvs&nbsp;with&nbsp;mouse&nbsp;over&nbsp;video&nbsp;feed</tt></dd></dl>
+ <dl><dt><a name="-mask_drawing"><strong>mask_drawing</strong></a>(w_name, img, color, thickness, x, y, shape, flag_shake)</dt><dd><tt>#&nbsp;function&nbsp;for&nbsp;drawing&nbsp;on&nbsp;canvas&nbsp;with&nbsp;object&nbsp;detection</tt></dd></dl>
+ <dl><dt><a name="-mask_drawing_video"><strong>mask_drawing_video</strong></a>(w_name, img, mask, color, thickness, x, y, shape, flag_shake)</dt><dd><tt>#&nbsp;function&nbsp;for&nbsp;drawing&nbsp;on&nbsp;canvas&nbsp;with&nbsp;object&nbsp;detection&nbsp;over&nbsp;video&nbsp;feed</tt></dd></dl>
+ <dl><dt><a name="-removeSmallComponents"><strong>removeSmallComponents</strong></a>(image, threshold)</dt><dd><tt>#Fuzzy&nbsp;detections&nbsp;that&nbsp;result&nbsp;in&nbsp;little&nbsp;blobs&nbsp;are&nbsp;cleared&nbsp;leaving&nbsp;only&nbsp;bigger&nbsp;objects&nbsp;detected</tt></dd></dl>
+ <dl><dt><a name="-shake_prevention"><strong>shake_prevention</strong></a>(x, y, past_x, past_y)</dt><dd><tt>#This&nbsp;function&nbsp;is&nbsp;used&nbsp;to&nbsp;combat&nbsp;erratic&nbsp;lines&nbsp;over&nbsp;canvas&nbsp;caused&nbsp;by&nbsp;poor&nbsp;object&nbsp;detection</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>Back</strong> = &lt;colorama.ansi.AnsiBack object&gt;<br>
+<strong>Fore</strong> = &lt;colorama.ansi.AnsiFore object&gt;<br>
+<strong>Style</strong> = &lt;colorama.ansi.AnsiStyle object&gt;<br>
+<strong>copied</strong> = False<br>
+<strong>copied_image</strong> = None<br>
+<strong>drawing</strong> = False<br>
+<strong>finished</strong> = False<br>
+<strong>flag</strong> = 0<br>
+<strong>holding</strong> = False<br>
+<strong>past_x</strong> = None<br>
+<strong>past_y</strong> = None<br>
+<strong>pt1_x</strong> = None<br>
+<strong>pt1_y</strong> = None</td></tr></table>
+</body></html>

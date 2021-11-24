@@ -165,7 +165,7 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
                 if not copied:
                     copied_image = img.copy()
                     copied = True
-                cv2.ellipse(copied_image, (pt1_x, pt1_y), (abs(x + 1 - pt1_x), abs(y + 1 - pt1_y)),
+                cv2.ellipse(copied_image, (pt1_x, pt1_y), (abs(x - pt1_x), abs(y - pt1_y)),
                             angle(pt1_x, x, pt1_y, y),
                             0., 360, color, thickness)
             if shape is Shape.LINE:
@@ -189,7 +189,7 @@ def line_drawing(event, x, y, flags, param, w_name, img, shape, color, thickness
         if shape is Shape.CIRCLE:
             cv2.circle(img, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
         if shape is Shape.ELLIPSE:
-            cv2.ellipse(img, (pt1_x, pt1_y), (abs(x + 1 - pt1_x), abs(y + 1 - pt1_y)), angle(pt1_x, x, pt1_y, y), 0.,
+            cv2.ellipse(img, (pt1_x, pt1_y), (abs(x - pt1_x), abs(y - pt1_y)), angle(pt1_x, x, pt1_y, y), 0.,
                         360, color,
                         thickness)
 
@@ -221,9 +221,8 @@ def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, colo
             if shape is Shape.CIRCLE:
                 cv2.circle(copied_image, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
             if shape is Shape.ELLIPSE:
-                cv2.ellipse(copied_image, (pt1_x, pt1_y), (abs(x + 1 - pt1_x), abs(y + 1 - pt1_y)), angle(pt1_x, x,
-                                                                                                          pt1_y, y), 0.,
-                            360, color, thickness)
+                cv2.ellipse(copied_image, (pt1_x, pt1_y), (abs(x - pt1_x), abs(y - pt1_y)), angle(pt1_x, x, pt1_y, y),
+                            0.,360, color, thickness)
             if shape is Shape.LINE:
                 cv2.line(mask, (pt1_x, pt1_y), (x, y), color=color, thickness=thickness)
                 pt1_x, pt1_y = x, y
@@ -240,7 +239,7 @@ def line_drawing_video(event, x, y, flags, param, w_name, img, mask, shape, colo
         if shape is Shape.CIRCLE:
             cv2.circle(mask, (pt1_x, pt1_y), distance((x, y), (pt1_x, pt1_y)), color, thickness)
         if shape is Shape.ELLIPSE:
-            cv2.ellipse(mask, (pt1_x, pt1_y), (abs(x + 1 - pt1_x), abs(y + 1 - pt1_y)), angle(pt1_x, x, pt1_y, y),
+            cv2.ellipse(mask, (pt1_x, pt1_y), (abs(x - pt1_x), abs(y - pt1_y)), angle(pt1_x, x, pt1_y, y),
                         0., 360, color, thickness)
 
     if event == cv2.EVENT_MBUTTONDOWN:
@@ -302,7 +301,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
             if shape is Shape.CIRCLE:
                 cv2.circle(copied_image, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
             if shape is Shape.ELLIPSE:
-                cv2.ellipse(copied_image, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
+                cv2.ellipse(copied_image, (past_x, past_y), (abs(x - past_x), abs(y - past_y)),
                             angle(past_x, x, past_y, y), 0., 360, color, thickness)
             else:
                 cv2.imshow(w_name, copied_image)
@@ -315,7 +314,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
         if shape is Shape.CIRCLE:
             cv2.circle(img, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
         if shape is Shape.ELLIPSE:
-            cv2.ellipse(img, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)), angle(past_x, x, past_y, y),
+            cv2.ellipse(img, (past_x, past_y), (abs(x - past_x), abs(y - past_y)), angle(past_x, x, past_y, y),
                         0., 360, color, thickness)
 
     if copied:
@@ -374,7 +373,7 @@ def mask_drawing_video(w_name, img, mask, color, thickness, x, y, shape, flag_sh
             if shape is Shape.CIRCLE:
                 cv2.circle(copied_image, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
             if shape is Shape.ELLIPSE:
-                cv2.ellipse(copied_image, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
+                cv2.ellipse(copied_image, (past_x, past_y), (abs(x - past_x), abs(y - past_y)),
                             angle(past_x, x, past_y, y), 0., 360, color, thickness)
             if shape is Shape.LINE:
                 cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
@@ -390,7 +389,7 @@ def mask_drawing_video(w_name, img, mask, color, thickness, x, y, shape, flag_sh
             if shape is Shape.CIRCLE:
                 cv2.circle(mask, (past_x, past_y), distance((x, y), (past_x, past_y)), color, thickness)
             if shape is Shape.ELLIPSE:
-                cv2.ellipse(mask, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
+                cv2.ellipse(mask, (past_x, past_y), (abs(x - past_x), abs(y - past_y)),
                             angle(past_x, x, past_y, y),
                             0., 360, color, thickness)
 

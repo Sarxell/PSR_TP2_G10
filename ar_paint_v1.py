@@ -313,6 +313,7 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
                 cv2.imshow(w_name, copied_image)
 
     if finished:
+        finished=False
         copied = False
         if shape is Shape.RECTANGLE:
             cv2.rectangle(img, (past_x, past_y), (x, y), color, thickness)
@@ -421,7 +422,7 @@ def main():
     parser.add_argument('-j', '--json', required=True, type=str, help='Full path to json file')
     parser.add_argument('-sp', '--use_shake_prevention', action='store_true',
                         help='Applies shake detection to the program')
-
+    
     args = vars(parser.parse_args())
 
     # ----------------

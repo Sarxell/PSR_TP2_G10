@@ -269,26 +269,28 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
             x = int(x)
             y = int(y)
             # it means there is a new line
-            if flag == 1:
-                cv2.line(img, (x, y), (x, y), color=color, thickness=thickness)
-                past_x = x
-                past_y = y
-                flag = 0
-            else:
-                # if flag = 0 it's the same line
-                if flag_shake is True:
-                    if not shake_prevention(x, y, past_x, past_y, color, img):
+            if shape is Shape.LINE:
+                if flag == 1:
+                    cv2.line(img, (x, y), (x, y), color=color, thickness=thickness)
+                    past_x = x
+                    past_y = y
+                    flag = 0
+                else:
+                    # if flag = 0 it's the same line
+                    if flag_shake is True:
+                        if not shake_prevention(x, y, past_x, past_y, color, img):
+                            if past_x and past_y:
+                                cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                                past_x = x
+                                past_y = y
+                    else:
                         if past_x and past_y:
                             cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
                             past_x = x
                             past_y = y
-                else:
-                    if past_x and past_y:
-                        cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
-                        past_x = x
-                        past_y = y
-
-
+            else:
+                past_x = x
+                past_y = y
         else:
             # it starts to be a new line again
             flag = 1
@@ -308,7 +310,10 @@ def mask_drawing(w_name, img, color, thickness, x, y, shape, flag_shake):
             if shape is Shape.ELLIPSE:
                 cv2.ellipse(copied_image, (past_x, past_y), (abs(x + 1 - past_x), abs(y + 1 - past_y)),
                             angle(past_x, x, past_y, y), 0., 360, color, thickness)
-
+            if shape is Shape.LINE:
+                cv2.line(img, (past_x, past_y), (x, y), color=color, thickness=thickness)
+                past_x = x
+                past_y = y
 
     if finished:
         finished = False

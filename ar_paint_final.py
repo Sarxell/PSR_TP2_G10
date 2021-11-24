@@ -181,12 +181,10 @@ def main():
 
         if key == ord('t'):
             path_bw = random.choice(list(d.values()))
-            print(path_bw)
             img = cv2.imread(path_bw)
             cv2.imshow(window_name, img)
             path_color = list(d.keys())[list(d.values()).index(path_bw)]
             img_color = cv2.imread(path_color)
-            print(path_color)
 
             # saves the image in the directory of the code
         if key == ord('w'):
